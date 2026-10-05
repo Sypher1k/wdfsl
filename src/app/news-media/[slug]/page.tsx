@@ -16,7 +16,7 @@ type Props={params:Promise<{slug:string}>};
 export async function generateStaticParams(){
  if(!client) return [];
  const posts=await client.fetch(NEWS_LIST_QUERY);
- return posts.map(post=>({slug:post.slug.current}));
+ return posts.map((post: any)=>({slug:post.slug.current}));
 }
 
 export async function generateMetadata({params}:Props):Promise<Metadata>{
