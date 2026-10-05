@@ -1,0 +1,3 @@
+import type { MetadataRoute } from 'next'; import {client} from '@/sanity/lib/client'; import {NEWS_LIST_QUERY} from '@/sanity/queries';
+import type { NewsListItem } from '@/sanity/types';
+export default async function sitemap():Promise<MetadataRoute.Sitemap>{const base='https://wdfsl.org'; const routes=['','about','what-we-do','janashakthi-banks','impact','projects','financials','publications','news-media','gallery','contact']; const pages=routes.map(path=>({url:`${base}/${path}`,lastModified:new Date()})); if(client){const posts = await client.fetch<NewsListItem[]>(NEWS_LIST_QUERY); pages.push(...posts.map((post)=>({url:`${base}/news-media/${post.slug.current}`,lastModified:post.publishedAt?new Date(post.publishedAt):new Date()})))} return pages}
