@@ -1,3 +1,0 @@
-import PageShell from '@/components/PageShell';
-export const metadata={title:'Contact Us'};
-export default function ContactPage(){return <PageShell label="CONTACT US" title={<>Let’s stay <em>connected.</em></>}><div className="contact-grid"><div><h3>Women’s Development Federation</h3><p>Viharamaha Devi Mandiraya,<br/>Old Tangalle Road,<br/>Hambantota, Sri Lanka</p><p><b>047-2220499</b><br/><b>047-2221022</b><br/>hwdf94@yahoo.com</p></div><div><p>For enquiries, please contact the Federation directly by phone or email.</p><a className="btn dark" href="mailto:hwdf94@yahoo.com">Email WDF ↗</a></div></div></PageShell>}
