@@ -1,0 +1,3 @@
+import PageShell from '@/components/PageShell'; import Link from 'next/link'; import Arrow from '@/components/Arrow'; import {programs} from '@/lib/site';
+export const metadata={title:'What We Do'};
+export default function WhatWeDoPage(){return <PageShell label="WHAT WE DO" title={<>Economic opportunity meets <em>social development.</em></>}><div className="program-detail-grid">{programs.map(([n,t,d])=><article key={t}><span>{n}</span><h3>{t}</h3><p>{d}</p><Link className="text-link" href={t==='Janashakthi Banks'?'/janashakthi-banks':'/projects'}>Explore <Arrow/></Link></article>)}</div></PageShell>}
