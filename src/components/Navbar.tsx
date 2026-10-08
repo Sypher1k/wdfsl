@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 
@@ -14,7 +15,9 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   return <header className={`nav ${open ? 'open' : ''}`}>
     <div className="nav-inner">
-      <Link className="brand" href="/" onClick={() => setOpen(false)}><span>WDF</span><small>Women’s Development<br/>Federation · Hambantota</small></Link>
+      <Link className="brand" href="/" onClick={() => setOpen(false)}>
+      <Image src="/images/hwdf_logo_rotating_transparent.gif" alt="Women’s Development Federation" width={76} height={76} unoptimized priority />
+      </Link>
       <nav aria-label="Primary navigation">
         {links.map(([label, href]) => <Link key={href} href={href} className={pathname === href || pathname.startsWith(`${href}/`) ? 'active' : ''} onClick={() => setOpen(false)}>{label}</Link>)}
       </nav>
