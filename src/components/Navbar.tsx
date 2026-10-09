@@ -7,7 +7,7 @@ import { useState } from 'react';
 
 const links = [
   ['About Us','/about'], ['What We Do','/what-we-do'], ['Janashakthi Banks','/janashakthi-banks'],
-  ['Our Impact','/impact'], ['Projects','/projects'], ['Publications','/publications'], ['News & Media','/news-media'],
+  ['Our Impact','/impact'], ['Projects','/projects'], ['Gallery','/gallery'], ['Publications','/publications'], ['News & Media','/news-media'],
 ];
 
 export default function Navbar() {
