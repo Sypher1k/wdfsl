@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { PortableText } from 'next-sanity';
@@ -32,9 +31,8 @@ export default async function NewsArticlePage({params}:Props){
  if(!client) notFound();
  const {slug}=await params; const article=await client.fetch(NEWS_ARTICLE_QUERY,{slug}); if(!article) notFound();
  const image=article.mainImage?.asset?urlForImage(article.mainImage)?.width(1800).height(1100).fit('crop').url():null;
- return <PageShell label={`${article.category||'NEWS'}${article.publishedAt?` · ${formatDate(article.publishedAt)}`:''}`} title={<>{article.title}</>}>
+ return <PageShell label={`${article.category||'NEWS'}${article.publishedAt?` · ${formatDate(article.publishedAt)}`:''}`} image={{src:image||'/images/wdf-img-1.jpeg',alt:article.mainImage?.alt||article.title}} title={<>{article.title}</>}>
    <article className="article-page">
-     {image&&<div className="article-hero-image"><Image src={image} alt={article.mainImage?.alt||article.title} fill priority sizes="(max-width: 900px) 100vw, 1100px"/></div>}
      <div className="article-layout"><aside><Link className="text-link" href="/news-media"><Arrow/> Back to News &amp; Media</Link>{article.author&&<p><strong>By</strong><br/>{article.author}</p>}</aside><div className="article-content">{article.excerpt&&<p className="article-lead">{article.excerpt}</p>}{article.body&&<PortableText value={article.body}/>}</div></div>
    </article>
  </PageShell>

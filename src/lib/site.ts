@@ -20,10 +20,10 @@ export const locations = [
 export const reports = [2025, 2024, 2023, 2022];
 
 export const galleryImages = [
-  ['https://images.unsplash.com/photo-1559027615-cd4628902d4a?auto=format&fit=crop&w=1200&q=85','Community development'],
-  ['https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=1200&q=85','Community members'],
-  ['https://images.unsplash.com/photo-1509099836639-18ba1795216d?auto=format&fit=crop&w=1200&q=85','Women working together'],
-  ['https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?auto=format&fit=crop&w=1200&q=85','Community participation'],
-  ['https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=1200&q=85','Learning and work'],
-  ['https://images.unsplash.com/photo-1542810634-71277d95dcbb?auto=format&fit=crop&w=1200&q=85','Children and community'],
+  ['/images/wdf-img-1.jpeg','Women meeting together in a community setting'],
+  ['/images/wdf-img-22.jpeg','Woman harvesting papaya in a home garden'],
+  ['/images/wdf-img-23.jpeg','Woman tending leafy vegetables'],
+  ['/images/wdf-img-18.jpeg','Women taking part in a public awareness march'],
+  ['/images/wdf-img-12.jpeg','Women developing sewing and livelihood skills'],
+  ['/images/wdf-img-2.jpeg','Children gathered at a community activity'],
 ] as const;
