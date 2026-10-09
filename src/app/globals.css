@@ -18,3 +18,41 @@
 .page-hero-image img{object-fit:cover}
 @media(max-width:900px){.page-hero-with-image{grid-template-columns:1fr;gap:30px;min-height:0}.page-hero-image{height:340px}}
 @media(max-width:600px){.page-hero-image{height:260px;border-radius:6px 60px 6px 6px}}
+
+.profitability{margin-top:110px;padding-top:75px;border-top:1px solid var(--line)}
+.profitability-heading{display:flex;justify-content:space-between;align-items:end;gap:32px;margin-bottom:34px}
+.profitability-heading h2{font-size:clamp(40px,5vw,64px);letter-spacing:-.035em}
+.profitability-heading>p{max-width:300px;margin:0;font-size:13px}
+.profitability-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:52px}
+.profitability-card{background:var(--forest);color:#fff;padding:26px 28px;min-height:132px;display:flex;flex-direction:column;justify-content:space-between}
+.profitability-card span{font-size:11px;color:#d6ddd7;font-weight:700;letter-spacing:.04em}
+.profitability-card strong{font:400 clamp(28px,3vw,40px)/1.1 'DM Serif Display',Georgia,serif;color:var(--sand);font-variant-numeric:tabular-nums}
+.profitability-panel,.profitability-table-section{margin-top:48px}
+.profitability-panel-heading{display:flex;justify-content:space-between;align-items:end;gap:24px;margin-bottom:22px}
+.profitability-panel-heading h3{font-size:34px}
+.profitability-panel-heading p{margin:8px 0 0;font-size:12px}
+.profitability-toggle{display:flex;border:1px solid var(--line);padding:3px;gap:3px;flex-shrink:0}
+.profitability-toggle button{border:0;background:transparent;color:var(--muted);padding:9px 13px;font-size:11px;font-weight:800}
+.profitability-toggle button[aria-pressed="true"]{background:var(--forest);color:white}
+.profit-chart{max-height:580px;overflow:auto;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:8px 8px 8px 0}
+.profit-chart-row{display:grid;grid-template-columns:minmax(130px,190px) minmax(120px,1fr) minmax(105px,135px);gap:16px;align-items:center;min-height:40px;border-bottom:1px solid rgba(221,211,197,.55)}
+.profit-chart-row:last-child{border-bottom:0}
+.profit-chart-name{font-size:11px;font-weight:700;color:var(--ink);overflow-wrap:anywhere}
+.profit-chart-track{height:22px;position:relative;background:linear-gradient(to right,transparent 49.8%,var(--line) 49.8%,var(--line) 50.2%,transparent 50.2%)}
+.profit-chart-zero{position:absolute;top:0;bottom:0;left:50%;width:1px;background:#9b8f7f;z-index:2}
+.profit-chart-bar{position:absolute;top:5px;height:12px;border-radius:2px;min-width:1px}
+.profit-chart-bar.positive{background:var(--forest)}
+.profit-chart-bar.negative{background:var(--terracotta)}
+.profit-chart-value{font-size:11px;font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap;color:var(--forest)}
+.profit-chart-value.negative-text{color:var(--terracotta)}
+.profit-search{display:flex;align-items:center;gap:10px;font-size:11px;font-weight:800;color:var(--muted)}
+.profit-search input{width:220px;border:1px solid var(--line);background:var(--paper);padding:11px 12px;font:500 12px Manrope,system-ui,sans-serif;color:var(--ink)}
+.profitability-table-wrap{margin-top:0;max-height:600px;overflow:auto}
+.profitability-table-wrap table{min-width:540px}
+.profitability-table-wrap th{position:sticky;top:0;background:var(--paper);z-index:1}
+.profit-sort{padding:0;border:0;background:none;color:var(--wine);font:inherit;text-transform:uppercase;letter-spacing:.12em}
+.profit-status{font-size:10px;font-weight:800;padding:5px 9px;display:inline-block;background:#e5ece6;color:var(--forest)}
+.profit-status.loss{background:#f2e6e1;color:#8b4934}
+.profit-status.break-even,.profit-status.unavailable{background:#ece8df;color:#756d63}
+.profitability-source{margin-top:22px;font-size:10px;color:var(--muted)}
+@media(max-width:650px){.profitability{margin-top:75px;padding-top:55px}.profitability-heading,.profitability-panel-heading{align-items:flex-start;flex-direction:column}.profitability-heading>p{max-width:none}.profitability-summary{grid-template-columns:1fr;gap:8px}.profitability-card{min-height:105px;padding:20px 22px}.profitability-panel-heading h3{font-size:30px}.profit-chart-row{grid-template-columns:minmax(88px,115px) minmax(70px,1fr) minmax(72px,90px);gap:9px}.profit-chart-name,.profit-chart-value{font-size:10px}.profit-search{width:100%;align-items:flex-start;flex-direction:column;gap:7px}.profit-search input{width:100%}}
