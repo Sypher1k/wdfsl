@@ -9,6 +9,16 @@ export type BranchProfit = {
 };
 export type MonthlyReport = {
   branches: BranchProfit[];
+  loans: {
+    outstandingLoanAmount: number | null;
+    numberOfBorrowers: number | null;
+    monthlyLoanDisbursement: number | null;
+    monthlyBorrowerCount: number | null;
+    atRiskLoanAmount: number | null;
+    parPercentage: number | null;
+    totalArrearsLoanAmount: number | null;
+    numberOfArrearsBorrowers: number | null;
+  };
   reportMonth: string;
   sourceFile: string;
 };

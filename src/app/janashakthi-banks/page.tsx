@@ -2,6 +2,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import PageShell from '@/components/PageShell';
 import ProfitabilityAnalytics, { type MonthlyReport } from './ProfitabilityAnalytics';
+import LoansAnalytics from './LoansAnalytics';
 
 export const metadata = { title: 'Janashakthi Banks' };
 export const dynamic = 'force-dynamic';
@@ -59,27 +60,57 @@ function readSummaryReports(): MonthlyReport[] {
     const branchIndex = headers.indexOf('Bank Association');
     const monthlyProfitIndex = headers.indexOf('Monthly Profit');
     const yearToDateProfitIndex = headers.indexOf('Profit to Date');
-    if (branchIndex < 0 || monthlyProfitIndex < 0 || yearToDateProfitIndex < 0) {
-      throw new Error(`The summary CSV must include Bank Association, Monthly Profit, and Profit to Date columns: ${sourceFile}`);
+    const loanColumnNames = {
+      outstandingLoanAmount: 'Outstanding Loan Amount',
+      numberOfBorrowers: 'Number of Borrowers',
+      monthlyLoanDisbursement: 'Monthly Loan Disbursement',
+      monthlyBorrowerCount: 'Monthly Borrower Count',
+      atRiskLoanAmount: 'At-Risk Loan Amount',
+      parPercentage: 'PAR Percentage',
+      totalArrearsLoanAmount: 'Total Arrears Loan Amount',
+      numberOfArrearsBorrowers: 'Number of Arrears Borrowers',
+    } as const;
+    const loanIndexes = Object.fromEntries(Object.entries(loanColumnNames).map(([key, name]) => [key, headers.indexOf(name)])) as Record<keyof typeof loanColumnNames, number>;
+    if (branchIndex < 0 || monthlyProfitIndex < 0 || yearToDateProfitIndex < 0 || Object.values(loanIndexes).some((index) => index < 0)) {
+      throw new Error(`The summary CSV is missing a required profitability or loans column: ${sourceFile}`);
     }
 
-    const branches = lines.slice(1).filter(Boolean).map(parseCsvLine).flatMap((row) => {
+    const branchRows = lines.slice(1).filter(Boolean).map(parseCsvLine).filter((row) => {
       const branchName = row[branchIndex]?.trim();
       // Numbered rows are branch records; the unnumbered total row is excluded.
-      if (!branchName || !/^\d+$/.test(row[0]?.trim() ?? '')) return [];
-      return [{
-        name: branchName,
-        monthlyProfit: parseAmount(row[monthlyProfitIndex]),
-        yearToDateProfit: parseAmount(row[yearToDateProfitIndex]),
-      }];
+      return Boolean(branchName && /^\d+$/.test(row[0]?.trim() ?? ''));
     });
+    const branches = branchRows.map((row) => ({
+      name: row[branchIndex].trim(),
+      monthlyProfit: parseAmount(row[monthlyProfitIndex]),
+      yearToDateProfit: parseAmount(row[yearToDateProfitIndex]),
+    }));
+    const sumReported = (key: keyof typeof loanColumnNames) => {
+      const values = branchRows.map((row) => parseAmount(row[loanIndexes[key]])).filter((value): value is number => value !== null);
+      return values.length ? values.reduce((total, value) => total + value, 0) : null;
+    };
+    const parPairs = branchRows.map((row) => ({
+      percentage: parseAmount(row[loanIndexes.parPercentage]),
+      outstanding: parseAmount(row[loanIndexes.outstandingLoanAmount]),
+    })).filter((pair): pair is { percentage: number; outstanding: number } => pair.percentage !== null && pair.outstanding !== null && pair.outstanding > 0);
+    const parWeight = parPairs.reduce((total, pair) => total + pair.outstanding, 0);
+    const loans = {
+      outstandingLoanAmount: sumReported('outstandingLoanAmount'),
+      numberOfBorrowers: sumReported('numberOfBorrowers'),
+      monthlyLoanDisbursement: sumReported('monthlyLoanDisbursement'),
+      monthlyBorrowerCount: sumReported('monthlyBorrowerCount'),
+      atRiskLoanAmount: sumReported('atRiskLoanAmount'),
+      parPercentage: parWeight ? parPairs.reduce((total, pair) => total + pair.percentage * pair.outstanding, 0) / parWeight : null,
+      totalArrearsLoanAmount: sumReported('totalArrearsLoanAmount'),
+      numberOfArrearsBorrowers: sumReported('numberOfArrearsBorrowers'),
+    };
 
     const reportMonth = sourceFile
       .replace(/^monthly_summary_/i, '')
       .replace(/\.csv$/i, '')
       .replace(/_/g, ' ')
       .toUpperCase();
-    return { branches, reportMonth, sourceFile };
+    return { branches, loans, reportMonth, sourceFile };
   });
 }
 
@@ -93,5 +124,6 @@ export default function BankPage() {
     <div className="table-wrap"><table><thead><tr><th>Savings product</th><th>Annual interest</th><th>Accounting</th></tr></thead><tbody>{[['Member Shares', '4%', 'Annual'], ['Member Deposits', '3%', 'Quarterly / semi-annual'], ['Group Deposits', '3%', 'Quarterly / semi-annual'], ['Amma Deposits', '3%', 'Quarterly / semi-annual'], ['Amma Contract Deposit', '4%', 'Quarterly; paid after five years'], ['Senehasa Deposits', '3%', 'Quarterly / semi-annual'], ['Open Deposits', '3%', 'Quarterly / semi-annual']].map((row) => <tr key={row[0]}>{row.map((cell) => <td key={cell}>{cell}</td>)}</tr>)}</tbody></table></div>
     <p className="source-note">Product terms above are taken from the supplied Bank Development translation and should be verified with WDF before being treated as current rates.</p>
     <ProfitabilityAnalytics reports={profitabilityReports} />
+    <LoansAnalytics reports={profitabilityReports} />
   </PageShell>;
 }
