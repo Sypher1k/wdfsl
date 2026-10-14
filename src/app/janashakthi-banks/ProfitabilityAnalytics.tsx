@@ -6,19 +6,40 @@ export type BranchProfit = {
   name: string;
   monthlyProfit: number | null;
   yearToDateProfit: number | null;
+  loans: LoanMetrics;
+  savings: SavingsMetrics;
+};
+export type LoanMetrics = {
+  outstandingLoanAmount: number | null;
+  numberOfBorrowers: number | null;
+  monthlyLoanDisbursement: number | null;
+  monthlyBorrowerCount: number | null;
+  atRiskLoanAmount: number | null;
+  parPercentage: number | null;
+  totalArrearsLoanAmount: number | null;
+  numberOfArrearsBorrowers: number | null;
+};
+export type SavingsMetrics = {
+  totalSavingsAmount: number | null;
+  savingsMembers: number | null;
+};
+export type MembershipMetrics = {
+  totalMembers: number | null;
+  savingsMembers: number | null;
+  aTypeMembers: number | null;
+  sharesCompleted: number | null;
+  totalGroups: number | null;
+  aGroupCount: number | null;
+  activeGroupCount: number | null;
+  totalSocieties: number | null;
+  aSocietyCount: number | null;
+  bSocietyCount: number | null;
 };
 export type MonthlyReport = {
   branches: BranchProfit[];
-  loans: {
-    outstandingLoanAmount: number | null;
-    numberOfBorrowers: number | null;
-    monthlyLoanDisbursement: number | null;
-    monthlyBorrowerCount: number | null;
-    atRiskLoanAmount: number | null;
-    parPercentage: number | null;
-    totalArrearsLoanAmount: number | null;
-    numberOfArrearsBorrowers: number | null;
-  };
+  loans: LoanMetrics;
+  savings: SavingsMetrics;
+  membership: MembershipMetrics;
   reportMonth: string;
   sourceFile: string;
 };
