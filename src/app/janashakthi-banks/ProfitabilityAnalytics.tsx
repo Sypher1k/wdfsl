@@ -68,10 +68,14 @@ export default function ProfitabilityAnalytics({ reports }: { reports: MonthlyRe
     loss: monthlyAvailable.filter((branch) => branch.monthlyProfit! < 0).length,
   }), [monthlyAvailable]);
 
-  const chartBranches = useMemo(() => [...branches].sort(
-    (a, b) => (b.monthlyProfit ?? Number.NEGATIVE_INFINITY) - (a.monthlyProfit ?? Number.NEGATIVE_INFINITY),
-  ), [branches]);
-  const shownBranches = chartMode === 'top10' ? chartBranches.filter((branch) => branch.monthlyProfit !== null).slice(0, 10) : chartBranches;
+  const profitBranches = useMemo(() => branches
+    .filter((branch) => branch.monthlyProfit !== null && branch.monthlyProfit > 0)
+    .sort((a, b) => b.monthlyProfit! - a.monthlyProfit!), [branches]);
+  const lossBranches = useMemo(() => branches
+    .filter((branch) => branch.monthlyProfit !== null && branch.monthlyProfit < 0)
+    .sort((a, b) => a.monthlyProfit! - b.monthlyProfit!), [branches]);
+  const shownProfitBranches = chartMode === 'top10' ? profitBranches.slice(0, 10) : profitBranches;
+  const shownLossBranches = chartMode === 'top10' ? lossBranches.slice(0, 10) : lossBranches;
   const filteredBranches = useMemo(() => {
     const matching = branches.filter((branch) => branch.name.toLowerCase().includes(query.trim().toLowerCase()));
     return matching.sort((a, b) => {
@@ -80,18 +84,43 @@ export default function ProfitabilityAnalytics({ reports }: { reports: MonthlyRe
       return (a.yearToDateProfit - b.yearToDateProfit) * (sortDirection === 'asc' ? 1 : -1);
     });
   }, [branches, query, sortDirection]);
-  const chartScale = Math.max(...shownBranches.map((branch) => Math.abs(branch.monthlyProfit ?? 0)), 1);
+  const chartScale = Math.max(...monthlyAvailable.map((branch) => Math.abs(branch.monthlyProfit!)), 1);
+
+  const renderChartRows = (shownBranches: BranchProfit[], positive: boolean) => (
+    <div className="profit-chart" role="list" aria-label={`${shownBranches.length} ${positive ? 'profitable' : 'loss-making'} branches`}>
+      {shownBranches.map((branch) => {
+        const profit = branch.monthlyProfit!;
+        const width = Math.abs(profit) / chartScale * 49;
+        const value = money.format(profit);
+        return <div className="profit-chart-row" role="listitem" key={branch.name}>
+          <span className="profit-chart-name">{branch.name}</span>
+          <div className="profit-chart-track" title={`${branch.name}: ${value}`} aria-label={`${branch.name}: ${value}`}>
+            <span className="profit-chart-zero" />
+            <span className={`profit-chart-bar ${positive ? 'positive' : 'negative'}`} style={{ width: `${width}%`, left: positive ? '50%' : `calc(50% - ${width}%)` }} />
+          </div>
+          <span className={`profit-chart-value ${positive ? '' : 'negative-text'}`} title={value}>{value}</span>
+        </div>;
+      })}
+      {shownBranches.length === 0 && <p className="profit-chart-empty">No {positive ? 'profitable' : 'loss-making'} branches for this month.</p>}
+    </div>
+  );
 
   return (
     <section className="profitability" aria-labelledby="profitability-title">
       <div className="profitability-heading">
         <div>
-          <div className="section-label">BANK PERFORMANCE · {reportMonth}</div>
+          {/* <div className="section-label">BANK PERFORMANCE · {reportMonth}</div> */}
+          
           <h2 id="profitability-title">Profitability Analytics</h2>
+          <h3>{reportMonth}</h3>
         </div>
-        <p>Branch results from the latest available monthly summary.</p>
+        <label className="profit-month-filter">Month
+          <select value={sourceFile} onChange={(event) => setSelectedFile(event.target.value)} aria-label="Filter profitability by month">
+            {reports.map((report) => <option key={report.sourceFile} value={report.sourceFile}>{report.reportMonth}</option>)}
+          </select>
+        </label>
       </div>
-
+      <h4 className="pt-2">Branch results from the latest available monthly summary.</h4>
       <div className="profitability-summary" aria-label="Monthly profit summary">
         <article className="profitability-card"><span>Total Monthly Profit</span><strong>{money.format(summary.total)}</strong></article>
         <article className="profitability-card"><span>Profitable Branches</span><strong>{money.format(summary.profitable)}</strong></article>
@@ -100,34 +129,23 @@ export default function ProfitabilityAnalytics({ reports }: { reports: MonthlyRe
 
       <section className="profitability-panel" aria-labelledby="branch-chart-title">
         <div className="profitability-panel-heading">
-          <div><h3 id="branch-chart-title">Profit by bank branch</h3><p>Monthly profitability · sorted highest to lowest</p></div>
+          <div><h3 id="branch-chart-title">Profit and loss by bank branch</h3><p>Monthly results · profits and losses ranked by amount</p></div>
           <div className="profit-chart-controls">
-            <label className="profit-month-filter">Month
-              <select value={sourceFile} onChange={(event) => setSelectedFile(event.target.value)} aria-label="Filter branch profits by month">
-                {reports.map((report) => <option key={report.sourceFile} value={report.sourceFile}>{report.reportMonth}</option>)}
-              </select>
-            </label>
             <div className="profitability-toggle" aria-label="Branches shown">
               <button type="button" aria-pressed={chartMode === 'all'} onClick={() => setChartMode('all')}>All branches</button>
               <button type="button" aria-pressed={chartMode === 'top10'} onClick={() => setChartMode('top10')}>Top 10</button>
             </div>
           </div>
         </div>
-        <div className="profit-chart" role="list" aria-label={`${shownBranches.length} branches by monthly profit`}>
-          {shownBranches.map((branch) => {
-            const profit = branch.monthlyProfit;
-            const positive = profit !== null && profit >= 0;
-            const width = profit === null ? 0 : Math.abs(profit) / chartScale * 49;
-            const value = profit === null ? 'Data unavailable' : money.format(profit);
-            return <div className="profit-chart-row" role="listitem" key={branch.name}>
-              <span className="profit-chart-name">{branch.name}</span>
-              <div className="profit-chart-track" title={`${branch.name}: ${value}`} aria-label={`${branch.name}: ${value}`}>
-                <span className="profit-chart-zero" />
-                {profit !== null && <span className={`profit-chart-bar ${positive ? 'positive' : 'negative'}`} style={{ width: `${width}%`, left: positive ? '50%' : `calc(50% - ${width}%)` }} />}
-              </div>
-              <span className={`profit-chart-value ${profit !== null && profit < 0 ? 'negative-text' : ''}`} title={value}>{value}</span>
-            </div>;
-          })}
+        <div className="profit-chart-columns">
+          <section className="profit-chart-column" aria-labelledby="profit-chart-title">
+            <h4 id="profit-chart-title">Profitable branches <span>({profitBranches.length})</span></h4>
+            {renderChartRows(shownProfitBranches, true)}
+          </section>
+          <section className="profit-chart-column" aria-labelledby="loss-chart-title">
+            <h4 id="loss-chart-title">Loss-making branches <span>({lossBranches.length})</span></h4>
+            {renderChartRows(shownLossBranches, false)}
+          </section>
         </div>
       </section>
 

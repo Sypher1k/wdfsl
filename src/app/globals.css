@@ -37,7 +37,12 @@
 .profit-chart-controls{display:flex;align-items:end;gap:12px}
 .profit-month-filter{display:flex;align-items:center;gap:9px;font-size:11px;font-weight:800;color:var(--muted)}
 .profit-month-filter select{min-width:150px;border:1px solid var(--line);background:var(--paper);color:var(--ink);padding:10px 30px 10px 12px;font:700 11px Manrope,system-ui,sans-serif}
-.profit-chart{max-height:580px;overflow:auto;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:8px 8px 8px 0}
+.profit-chart-columns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
+.profit-chart-column h4{margin:0 0 12px;font-size:15px;color:var(--forest)}
+.profit-chart-column h4 span{font-size:11px;color:var(--muted);font-weight:600}
+.profit-chart{max-height:580px;overflow:auto;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:8px}
+.profit-chart-empty{margin:0;padding:16px 0;font-size:12px;color:var(--muted)}
+.profit-chart .profit-chart-row{grid-template-columns:minmax(80px,1fr) minmax(45px,.8fr) minmax(70px,auto);gap:10px}
 .profit-chart-row{display:grid;grid-template-columns:minmax(130px,190px) minmax(120px,1fr) minmax(105px,135px);gap:16px;align-items:center;min-height:40px;border-bottom:1px solid rgba(221,211,197,.55)}
 .profit-chart-row:last-child{border-bottom:0}
 .profit-chart-name{font-size:11px;font-weight:700;color:var(--ink);overflow-wrap:anywhere}
@@ -97,7 +102,7 @@
 .membership-metric span{font-size:10px;line-height:1.5;color:#d6ddd7;font-weight:700}
 .membership-metric strong{font:400 clamp(22px,2.7vw,34px)/1.1 'DM Serif Display',Georgia,serif;color:var(--sand);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
 .membership-source{margin-top:20px;font-size:10px;color:var(--muted)}
-@media(max-width:650px){.profitability{margin-top:75px;padding-top:55px}.profitability-heading,.profitability-panel-heading{align-items:flex-start;flex-direction:column}.profitability-heading>p{max-width:none}.profitability-summary{grid-template-columns:1fr;gap:8px}.profitability-card{min-height:105px;padding:20px 22px}.profitability-panel-heading h3{font-size:30px}.profit-chart-controls{width:100%;flex-wrap:wrap}.profit-month-filter{width:100%;justify-content:space-between}.profit-month-filter select{flex:1}.profit-chart-row{grid-template-columns:minmax(88px,115px) minmax(70px,1fr) minmax(72px,90px);gap:9px}.profit-chart-name,.profit-chart-value{font-size:10px}.profit-search{width:100%;align-items:flex-start;flex-direction:column;gap:7px}.profit-search input{width:100%}}
+@media(max-width:650px){.profitability{margin-top:75px;padding-top:55px}.profitability-heading,.profitability-panel-heading{align-items:flex-start;flex-direction:column}.profitability-heading>p{max-width:none}.profitability-summary{grid-template-columns:1fr;gap:8px}.profitability-card{min-height:105px;padding:20px 22px}.profitability-panel-heading h3{font-size:30px}.profit-chart-columns{grid-template-columns:1fr;gap:20px}.profit-chart-controls{width:100%;flex-wrap:wrap}.profit-month-filter{width:100%;justify-content:space-between}.profit-month-filter select{flex:1}.profit-chart-row{grid-template-columns:minmax(88px,115px) minmax(70px,1fr) minmax(72px,90px);gap:9px}.profit-chart-name,.profit-chart-value{font-size:10px}.profit-search{width:100%;align-items:flex-start;flex-direction:column;gap:7px}.profit-search input{width:100%}}
 @media(max-width:900px){.loans-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:900px){.membership-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:650px){.loans-analytics{margin-top:75px;padding-top:55px}.loans-heading,.savings-heading,.membership-heading{align-items:flex-start;flex-direction:column}.loan-filters{width:100%;display:grid;grid-template-columns:1fr}.loans-heading .profit-month-filter,.savings-heading .profit-month-filter,.membership-heading .profit-month-filter,.loan-branch-filter{width:100%;justify-content:space-between}.profit-month-filter select,.loan-branch-trigger{width:100%}.loan-metric{min-height:125px;padding:18px}.loan-metric strong{font-size:24px}.savings-analytics,.membership-analytics{margin-top:75px;padding-top:55px}.savings-metrics{grid-template-columns:1fr}.savings-metric{min-height:125px;padding:20px}.savings-metric strong{font-size:32px}.membership-metrics{grid-template-columns:1fr 1fr}.membership-metric{min-height:112px;padding:16px}.membership-metric strong{font-size:25px}}
