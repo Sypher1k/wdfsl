@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { LoanMetrics, MonthlyReport } from './ProfitabilityAnalytics';
 
 const number = new Intl.NumberFormat('en-LK', { maximumFractionDigits: 0 });
-const percentage = new Intl.NumberFormat('en-LK', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+const percentage = new Intl.NumberFormat('en-LK', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 export default function LoansAnalytics({ reports }: { reports: MonthlyReport[] }) {
   const [selectedFile, setSelectedFile] = useState(reports[0]?.sourceFile ?? '');
@@ -82,7 +82,7 @@ export default function LoansAnalytics({ reports }: { reports: MonthlyReport[] }
       <div className="loans-metrics">
         {metrics.map(([label, value, kind]) => <article className="loan-metric" key={label}>
           <span>{label}</span>
-          <strong>{value === null ? 'Data unavailable' : kind === 'percent' ? `${percentage.format(value)}%` : number.format(value)}</strong>
+          <strong>{kind === 'percent' ? `${percentage.format(value ?? 0)}%` : number.format(value ?? 0)}</strong>
         </article>)}
       </div>
       <p className="loans-source">Source: {report.sourceFile}. All-branch totals sum reported branch values; blank and dash entries are excluded rather than treated as zero. PAR is calculated as reported At-Risk Loan Amount divided by reported Outstanding Loan Amount because the CSV PAR values are rounded.</p>

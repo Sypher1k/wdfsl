@@ -8,6 +8,7 @@ export type BranchProfit = {
   yearToDateProfit: number | null;
   loans: LoanMetrics;
   savings: SavingsMetrics;
+  membership: MembershipMetrics;
 };
 export type LoanMetrics = {
   outstandingLoanAmount: number | null;
@@ -105,6 +106,7 @@ export default function ProfitabilityAnalytics({ reports }: { reports: MonthlyRe
     .sort((a, b) => (a.yearToDateProfit! - b.yearToDateProfit!) * (sortDirection === 'desc' ? 1 : -1));
   const yearToDateOtherBranches = filteredBranches.filter((branch) => branch.yearToDateProfit === null || branch.yearToDateProfit === 0);
   const chartScale = Math.max(...monthlyAvailable.map((branch) => Math.abs(branch.monthlyProfit!)), 1);
+  const yearToDateChartScale = Math.max(...yearToDateAvailable.map((branch) => Math.abs(branch.yearToDateProfit!)), 1);
 
   useEffect(() => {
     const closeIfOutside = (event: MouseEvent) => {
@@ -142,12 +144,23 @@ export default function ProfitabilityAnalytics({ reports }: { reports: MonthlyRe
   const renderYearToDateTable = (title: string, tableBranches: BranchProfit[]) => (
     <section className="profitability-table-column" aria-label={title}>
       <h4>{title} <span>({tableBranches.length})</span></h4>
-      <div className="table-wrap profitability-table-wrap"><table>
-        <thead><tr><th scope="col">Branch Name</th><th scope="col"><button className="profit-sort" type="button" onClick={() => setSortDirection((direction) => direction === 'desc' ? 'asc' : 'desc')} aria-label={`Sort by year-to-date profit ${sortDirection === 'desc' ? 'ascending' : 'descending'}`}>Profit YTD {sortDirection === 'desc' ? '↓' : '↑'}</button></th><th scope="col">Status</th></tr></thead>
-        <tbody>{tableBranches.map((branch) => <tr key={branch.name}><td>{branch.name}</td><td>{branch.yearToDateProfit === null ? '—' : money.format(branch.yearToDateProfit)}</td><td><span className={`profit-status ${branch.yearToDateProfit === null ? 'unavailable' : branch.yearToDateProfit < 0 ? 'loss' : branch.yearToDateProfit === 0 ? 'break-even' : 'gain'}`}>{status(branch.yearToDateProfit)}</span></td></tr>)}
-          {tableBranches.length === 0 && <tr><td colSpan={3}>No branches in this group.</td></tr>}
-        </tbody>
-      </table></div>
+      <div className="profit-chart" role="list" aria-label={`${tableBranches.length} ${title.toLowerCase()}`}>
+        {tableBranches.map((branch) => {
+          const profit = branch.yearToDateProfit!;
+          const width = Math.abs(profit) / yearToDateChartScale * 49;
+          const value = money.format(profit);
+          const positive = profit > 0;
+          return <div className="profit-chart-row" role="listitem" key={branch.name}>
+            <span className="profit-chart-name">{branch.name}</span>
+            <div className="profit-chart-track" title={`${branch.name}: ${value}`} aria-label={`${branch.name}: ${value}`}>
+              <span className="profit-chart-zero" />
+              <span className={`profit-chart-bar ${positive ? 'positive' : 'negative'}`} style={{ width: `${width}%`, left: positive ? '50%' : `calc(50% - ${width}%)` }} />
+            </div>
+            <span className={`profit-chart-value ${positive ? '' : 'negative-text'}`} title={value}>{value}</span>
+          </div>;
+        })}
+        {tableBranches.length === 0 && <p className="profit-chart-empty">No branches in this group.</p>}
+      </div>
     </section>
   );
 

@@ -120,6 +120,7 @@ function readSummaryReports(): MonthlyReport[] {
           totalSavingsAmount: parseAmount(row[totalSavingsIndex]),
           savingsMembers: parseAmount(row[savingsMembersIndex]),
         },
+        membership: Object.fromEntries(Object.entries(membershipIndexes).map(([key, index]) => [key, parseAmount(row[index])])) as Record<keyof typeof membershipColumnNames, number | null>,
       };
     });
     const sumReportedColumn = (columnIndex: number) => {
