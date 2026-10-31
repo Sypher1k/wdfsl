@@ -20,6 +20,36 @@
 @media(max-width:600px){.page-hero-image{height:260px;border-radius:6px 60px 6px 6px}}
 
 .profitability{margin-top:110px;padding-top:75px;border-top:1px solid var(--line)}
+.community-reports{margin-top:100px;padding-top:75px;border-top:1px solid var(--line)}
+.community-reports-heading{display:flex;justify-content:space-between;align-items:end;gap:30px;margin-bottom:10px}
+.community-reports-heading h2{font-size:clamp(38px,5vw,62px);letter-spacing:-.035em;max-width:850px}
+.community-reports-heading .section-label{margin-bottom:18px}
+.community-reports-heading .profit-month-filter{flex-shrink:0}
+.community-report-period{margin:16px 0 42px;font-size:13px}
+.community-report-group{padding:34px 0 40px;border-top:1px solid var(--line)}
+.community-report-group-heading{display:flex;align-items:baseline;gap:16px;margin-bottom:22px}
+.community-report-group-heading>span{font-size:11px;letter-spacing:.14em;font-weight:800;color:var(--wine)}
+.community-report-group-heading h3{font-size:clamp(26px,3vw,36px)}
+.community-report-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:1px;background:var(--line)}
+.community-report-metric{min-height:105px;padding:18px;background:var(--paper);display:flex;flex-direction:column;justify-content:space-between;gap:12px}
+.community-report-metric span{font-size:10px;line-height:1.5;font-weight:700;color:var(--muted)}
+.community-report-metric strong{font:400 clamp(22px,2.5vw,30px)/1.1 'DM Serif Display',Georgia,serif;color:var(--forest);font-variant-numeric:tabular-nums}
+.community-report-charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:30px;margin-top:26px}
+.community-report-chart h4,.community-welfare-card h4{font-size:15px;color:var(--forest);margin:0 0 14px;font-weight:800}
+.community-report-bar-row{display:grid;grid-template-columns:minmax(100px,155px) minmax(55px,1fr) minmax(64px,auto);gap:12px;align-items:center;min-height:34px;border-bottom:1px solid rgba(221,211,197,.6)}
+.community-report-bar-row>span{font-size:11px;color:var(--ink)}
+.community-report-bar-row>b{font-size:11px;text-align:right;font-variant-numeric:tabular-nums}
+.community-report-track{height:10px;background:var(--cream)}
+.community-report-track i{display:block;height:100%;background:var(--forest)}
+.community-welfare-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:var(--line)}
+.community-welfare-card{background:var(--paper);padding:24px}
+.community-welfare-card:last-child:nth-child(odd){grid-column:1/-1}
+.community-welfare-card .community-report-metrics{grid-template-columns:repeat(auto-fit,minmax(135px,1fr));background:transparent;gap:8px}
+.community-welfare-card .community-report-metric{border:1px solid var(--line);min-height:88px;padding:13px}
+.community-welfare-card .community-report-metric strong{font-size:24px}
+.community-report-source{margin:10px 0 0;font-size:11px;line-height:1.6}
+.community-report-source span{color:var(--ink);font-weight:700}
+@media(max-width:650px){.community-reports{margin-top:75px;padding-top:55px}.community-reports-heading{align-items:flex-start;flex-direction:column}.community-reports-heading .profit-month-filter{width:100%;justify-content:space-between}.community-reports-heading .profit-month-filter select{flex:1}.community-report-group{padding:26px 0 30px}.community-report-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.community-report-metric{min-height:96px;padding:14px}.community-report-metric strong{font-size:23px}.community-report-charts,.community-welfare-grid{grid-template-columns:1fr}.community-welfare-card:last-child:nth-child(odd){grid-column:auto}.community-report-bar-row{grid-template-columns:minmax(90px,130px) minmax(40px,1fr) minmax(60px,auto);gap:8px}}
 .profitability-heading{display:flex;justify-content:space-between;align-items:end;gap:32px;margin-bottom:34px}
 .profitability-heading h2{font-size:clamp(40px,5vw,64px);letter-spacing:-.035em}
 .profitability-heading>p{max-width:300px;margin:0;font-size:13px}
@@ -113,3 +143,5 @@
 @media(max-width:900px){.loans-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:900px){.membership-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:650px){.loans-analytics{margin-top:75px;padding-top:55px}.loans-heading,.savings-heading,.membership-heading{align-items:flex-start;flex-direction:column}.loan-filters{width:100%;display:grid;grid-template-columns:1fr}.membership-filters{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.loans-heading .profit-month-filter,.savings-heading .profit-month-filter,.membership-heading .profit-month-filter,.loan-branch-filter{width:100%;justify-content:space-between}.membership-heading .profit-month-filter,.membership-heading .loan-branch-filter{min-width:0}.membership-heading .profit-month-filter{align-items:stretch;flex-direction:column;gap:7px}.membership-heading .profit-month-filter select{min-width:0;padding-right:8px}.profit-month-filter select,.loan-branch-trigger{width:100%}.loan-metric{min-height:125px;padding:18px}.loan-metric strong{font-size:24px}.savings-analytics,.membership-analytics{margin-top:75px;padding-top:55px}.savings-metrics{grid-template-columns:1fr}.savings-metric{min-height:125px;padding:20px}.savings-metric strong{font-size:32px}.membership-metrics{grid-template-columns:1fr 1fr}.membership-metric{min-height:112px;padding:16px}.membership-metric strong{font-size:25px}}
+.branch-back-link{margin:0 0 38px;font-size:13px;font-weight:800}.branch-back-link a{color:var(--wine);text-decoration:none}.bank-branch-directory{margin-top:90px;padding-top:45px;border-top:1px solid var(--line)}.bank-branch-directory h2{font-size:clamp(36px,5vw,58px);margin:12px 0}.bank-branch-directory>p{max-width:620px}.bank-branch-links{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);margin-top:32px}.bank-branch-links a{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:17px 18px;background:var(--paper);color:var(--ink);font-size:13px;text-decoration:none}.bank-branch-links a:hover{background:var(--cream);color:var(--wine)}.bank-branch-links a span{color:var(--wine)}@media(max-width:900px){.bank-branch-links{grid-template-columns:repeat(3,1fr)}}@media(max-width:600px){.bank-branch-links{grid-template-columns:repeat(2,1fr)}}
+.branch-contact-layout{display:grid;grid-template-columns:1fr 1fr;gap:48px;margin:42px 0 80px;align-items:stretch}.branch-contact-details{background:var(--paper);padding:42px}.branch-contact-details h2{font:400 clamp(32px,4vw,48px) 'DM Serif Display';margin:18px 0 28px}.branch-contact-details dl{margin:0}.branch-contact-details dl>div{padding:16px 0;border-top:1px solid var(--line)}.branch-contact-details dt{font-size:10px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:var(--wine);margin-bottom:7px}.branch-contact-details dd{margin:0;line-height:1.6}.branch-contact-details a{color:inherit;text-decoration:none}.branch-placeholder-note{font-size:12px;color:#666;margin:24px 0 0}.branch-map{min-height:440px;background:var(--line)}.branch-map iframe{display:block;width:100%;height:100%;min-height:440px;border:0}@media(max-width:900px){.branch-contact-layout{grid-template-columns:1fr;gap:24px}.branch-contact-details{padding:30px}}

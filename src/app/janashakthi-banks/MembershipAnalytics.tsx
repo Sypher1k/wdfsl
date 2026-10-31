@@ -5,7 +5,7 @@ import type { MonthlyReport } from './ProfitabilityAnalytics';
 
 const count = new Intl.NumberFormat('en-LK', { maximumFractionDigits: 0 });
 
-export default function MembershipAnalytics({ reports }: { reports: MonthlyReport[] }) {
+export default function MembershipAnalytics({ reports, branchName }: { reports: MonthlyReport[]; branchName?: string }) {
   const [selectedFile, setSelectedFile] = useState(reports[0]?.sourceFile ?? '');
   const [selectedBranch, setSelectedBranch] = useState('all');
   const [branchQuery, setBranchQuery] = useState('');
@@ -55,7 +55,7 @@ export default function MembershipAnalytics({ reports }: { reports: MonthlyRepor
             {reports.map((item) => <option key={item.sourceFile} value={item.sourceFile}>{item.reportMonth}</option>)}
           </select>
         </label>
-        <div className="loan-branch-filter" ref={branchDropdownRef}>
+        {!branchName && <div className="loan-branch-filter" ref={branchDropdownRef}>
           <span className="loan-filter-label">Branch</span>
           <button className="loan-branch-trigger" type="button" aria-haspopup="listbox" aria-expanded={branchDropdownOpen} aria-label={`Membership branch filter: ${selectedBranchData && selectedBranch !== 'all' ? selectedBranchData.name : 'All Branches'}`} onClick={() => { setBranchDropdownOpen((open) => !open); setBranchQuery(''); }}>
             <span>{selectedBranchData && selectedBranch !== 'all' ? selectedBranchData.name : 'All Branches'}</span><span aria-hidden="true">⌄</span>
@@ -71,7 +71,7 @@ export default function MembershipAnalytics({ reports }: { reports: MonthlyRepor
               {visibleBranches.length === 0 && <span className="loan-branch-empty">No branches match.</span>}
             </div>
           </div>}
-        </div>
+        </div>}
         </div>
       </div>
       <div className="membership-metrics">

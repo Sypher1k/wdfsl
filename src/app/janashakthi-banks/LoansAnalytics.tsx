@@ -6,7 +6,7 @@ import type { LoanMetrics, MonthlyReport } from './ProfitabilityAnalytics';
 const number = new Intl.NumberFormat('en-LK', { maximumFractionDigits: 0 });
 const percentage = new Intl.NumberFormat('en-LK', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-export default function LoansAnalytics({ reports }: { reports: MonthlyReport[] }) {
+export default function LoansAnalytics({ reports, branchName }: { reports: MonthlyReport[]; branchName?: string }) {
   const [selectedFile, setSelectedFile] = useState(reports[0]?.sourceFile ?? '');
   const [selectedBranch, setSelectedBranch] = useState('all');
   const [branchQuery, setBranchQuery] = useState('');
@@ -56,7 +56,7 @@ export default function LoansAnalytics({ reports }: { reports: MonthlyReport[] }
               {reports.map((item) => <option key={item.sourceFile} value={item.sourceFile}>{item.reportMonth}</option>)}
             </select>
           </label>
-          <div className="loan-branch-filter" ref={branchDropdownRef}>
+          {!branchName && <div className="loan-branch-filter" ref={branchDropdownRef}>
             <span className="loan-filter-label">Branch</span>
             <button className="loan-branch-trigger" type="button" aria-haspopup="listbox" aria-expanded={branchDropdownOpen} aria-label={`Branch filter: ${selectedBranchData && selectedBranch !== 'all' ? selectedBranchData.name : 'All Branches'}`} onClick={() => { setBranchDropdownOpen((open) => !open); setBranchQuery(''); }}>
               <span>{selectedBranchData && selectedBranch !== 'all' ? selectedBranchData.name : 'All Branches'}</span><span aria-hidden="true">⌄</span>
@@ -75,10 +75,10 @@ export default function LoansAnalytics({ reports }: { reports: MonthlyReport[] }
                 {visibleBranches.length === 0 && <span className="loan-branch-empty">No branches match.</span>}
               </div>
             </div>}
-          </div>
+          </div>}
         </div>
       </div>
-      <p className="loan-selection">Showing loan statistics for <strong>{selectedBranchData && selectedBranch !== 'all' ? selectedBranchData.name : 'All Branches'}</strong>.</p>
+      <p className="loan-selection">Showing loan statistics for <strong>{branchName ?? (selectedBranchData && selectedBranch !== 'all' ? selectedBranchData.name : 'All Branches')}</strong>.</p>
       <div className="loans-metrics">
         {metrics.map(([label, value, kind]) => <article className="loan-metric" key={label}>
           <span>{label}</span>

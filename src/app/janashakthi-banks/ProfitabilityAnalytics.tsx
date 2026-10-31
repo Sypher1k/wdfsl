@@ -27,14 +27,29 @@ export type SavingsMetrics = {
 export type MembershipMetrics = {
   totalMembers: number | null;
   savingsMembers: number | null;
+  activeMembers: number | null;
   aTypeMembers: number | null;
   sharesCompleted: number | null;
+  sharesIncomplete: number | null;
   totalGroups: number | null;
   aGroupCount: number | null;
+  aPlusGroupCount: number | null;
   activeGroupCount: number | null;
+  inactiveGroupCount: number | null;
   totalSocieties: number | null;
   aSocietyCount: number | null;
   bSocietyCount: number | null;
+  seniorCitizensSocietyCount: number | null;
+  seniorCitizenMemberCount: number | null;
+  childrensSocietyCount: number | null;
+  childrensSocietyMemberCount: number | null;
+  modelHomeGardenCount: number | null;
+  homeGardenDemonstrationCount: number | null;
+  supportServicesMonthly: number | null;
+  specialDayCelebrationsMonthly: number | null;
+  creativeProgrammesMonthly: number | null;
+  deviSocietyMemberCount: number | null;
+  deviSocietyCount: number | null;
 };
 export type MonthlyReport = {
   branches: BranchProfit[];
@@ -54,7 +69,7 @@ function status(profit: number | null) {
   return 'Break-even';
 }
 
-export default function ProfitabilityAnalytics({ reports }: { reports: MonthlyReport[] }) {
+export default function ProfitabilityAnalytics({ reports, summaryOnly = false }: { reports: MonthlyReport[]; summaryOnly?: boolean }) {
   const [chartMode, setChartMode] = useState<'all' | 'top10'>('all');
   const [branchQuery, setBranchQuery] = useState('');
   const [selectedBranch, setSelectedBranch] = useState('all');
@@ -186,7 +201,7 @@ export default function ProfitabilityAnalytics({ reports }: { reports: MonthlyRe
         <article className="profitability-card"><span>Branches Making a Loss</span><strong>{money.format(summary.loss)}</strong></article>
       </div>
 
-      <section className="profitability-panel" aria-labelledby="branch-chart-title">
+      {!summaryOnly && <section className="profitability-panel" aria-labelledby="branch-chart-title">
         <div className="profitability-panel-heading">
           <div><h3 id="branch-chart-title">Profit and loss by bank branch</h3><p>Monthly results · profits and losses ranked by amount</p></div>
           <div className="profit-chart-controls">
@@ -206,9 +221,9 @@ export default function ProfitabilityAnalytics({ reports }: { reports: MonthlyRe
             {renderChartRows(shownLossBranches, false)}
           </section>
         </div>
-      </section>
+      </section>}
 
-      <section className="profitability-table-section" aria-labelledby="branch-table-title">
+      {!summaryOnly && <section className="profitability-table-section" aria-labelledby="branch-table-title">
         <div className="profitability-panel-heading">
           <div><h3 id="branch-table-title">Branch profit table</h3><p>Profit year to date · {filteredBranches.length} bank branches</p></div>
           <div className="loan-branch-filter profit-branch-filter" ref={branchDropdownRef}>
@@ -249,8 +264,8 @@ export default function ProfitabilityAnalytics({ reports }: { reports: MonthlyRe
             <tbody>{yearToDateOtherBranches.map((branch) => <tr key={branch.name}><td>{branch.name}</td><td>{branch.yearToDateProfit === null ? '—' : money.format(branch.yearToDateProfit)}</td><td><span className={`profit-status ${branch.yearToDateProfit === null ? 'unavailable' : 'break-even'}`}>{status(branch.yearToDateProfit)}</span></td></tr>)}</tbody>
           </table></div>
         </section>}
-      </section>
-      <p className="profitability-source">Source: {sourceFile}. “Monthly Profit” powers the monthly summary and chart; “Profit to Date” powers the year-to-date summary and branch table. Summary rows are excluded. Figures are shown as recorded; currency is not specified in the source.</p>
+      </section>}
+      <p className="profitability-source">Source: {sourceFile}. {summaryOnly ? '“Monthly Profit” powers the profit summary.' : '“Monthly Profit” powers the monthly summary and chart; “Profit to Date” powers the year-to-date summary and branch table.'} Summary rows are excluded. Figures are shown as recorded; currency is not specified in the source.</p>
     </section>
   );
 }
