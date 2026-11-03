@@ -5,6 +5,12 @@ import type { MembershipMetrics, MonthlyReport } from './ProfitabilityAnalytics'
 
 const count = new Intl.NumberFormat('en-LK', { maximumFractionDigits: 0 });
 type Metric = readonly [string, number | null];
+type CommunityReportGroup = {
+  id: string;
+  title: string;
+  metrics: Metric[];
+  charts: { title: string; items: Metric[] }[];
+};
 
 function MetricCards({ metrics }: { metrics: Metric[] }) {
   return <div className="community-report-metrics">{metrics.map(([label, value]) => <article className="community-report-metric" key={label}>
@@ -24,7 +30,7 @@ function BarChart({ title, items }: { title: string; items: Metric[] }) {
   </div>;
 }
 
-function reportGroups(m: MembershipMetrics) {
+function reportGroups(m: MembershipMetrics): CommunityReportGroup[] {
   return [
     { id: 'membership', title: 'Bank Membership & Share Capital Status', metrics: [
       ['Total Members', m.totalMembers], ['Savings Members', m.savingsMembers], ['Active Members', m.activeMembers],
