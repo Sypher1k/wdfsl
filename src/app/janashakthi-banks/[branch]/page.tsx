@@ -32,7 +32,7 @@ export default async function BankBranchPage({ params }: { params: Promise<{ bra
     return branch ? { ...report, branches: [branch], loans: branch.loans, savings: branch.savings, membership: branch.membership } : { ...report, branches: [], loans: { ...report.loans, outstandingLoanAmount: null, numberOfBorrowers: null, monthlyLoanDisbursement: null, monthlyBorrowerCount: null, atRiskLoanAmount: null, parPercentage: null, totalArrearsLoanAmount: null, numberOfArrearsBorrowers: null }, savings: { totalSavingsAmount: null, savingsMembers: null }, membership: Object.fromEntries(Object.keys(report.membership).map((key) => [key, null])) as typeof report.membership };
   });
 
-  return <PageShell label="JANASHAKTHI BANKS · BRANCH" image={{ src: '/images/wdf-img-4.jpeg', alt: 'Women gathered around records at a community banking meeting' }} title={<>{branchName}, <em>community finance.</em></>}>
+  return <PageShell label="JANASHAKTHI BANKS · BRANCH" image={{ src: '/images/wdf-img-4.jpeg', alt: 'Women gathered around records at a community banking meeting' }} title={<>Janashakthi Bank, <em>{branchName}</em></>}>
     <p className="branch-back-link"><a href="/janashakthi-banks">← All Janashakthi branches</a></p>
     <section className="branch-contact-layout" aria-label={`${branchName} branch contact details`}>
       <div className="branch-contact-details">

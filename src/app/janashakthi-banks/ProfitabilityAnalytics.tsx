@@ -92,6 +92,8 @@ export default function ProfitabilityAnalytics({ reports, summaryOnly = false }:
     profitable: yearToDateAvailable.filter((branch) => branch.yearToDateProfit! > 0).length,
     loss: yearToDateAvailable.filter((branch) => branch.yearToDateProfit! < 0).length,
   }), [yearToDateAvailable]);
+  const monthlyTotalLabel = `Total Monthly ${summary.total < 0 ? 'Loss' : 'Profit'}`;
+  const yearToDateTotalLabel = `YTD ${yearToDateSummary.total < 0 ? 'Loss' : 'Profit'}`;
 
   const profitBranches = useMemo(() => branches
     .filter((branch) => branch.monthlyProfit !== null && branch.monthlyProfit > 0)
@@ -196,9 +198,10 @@ export default function ProfitabilityAnalytics({ reports, summaryOnly = false }:
       </div>
       <h4 className="pt-2">Branch results from the latest available monthly summary.</h4>
       <div className="profitability-summary" aria-label="Monthly profit summary">
-        <article className="profitability-card"><span>Total Monthly Profit</span><strong>{money.format(summary.total)}</strong></article>
-        <article className="profitability-card"><span>Profitable Branches</span><strong>{money.format(summary.profitable)}</strong></article>
-        <article className="profitability-card"><span>Branches Making a Loss</span><strong>{money.format(summary.loss)}</strong></article>
+        <article className="profitability-card"><span>{monthlyTotalLabel}</span><strong>{money.format(summary.total)}</strong></article>
+        {summaryOnly && <article className="profitability-card"><span>{yearToDateTotalLabel}</span><strong>{money.format(yearToDateSummary.total)}</strong></article>}
+        {!summaryOnly && <article className="profitability-card"><span>Profitable Branches</span><strong>{money.format(summary.profitable)}</strong></article>}
+        {!summaryOnly && <article className="profitability-card"><span>Branches Making a Loss</span><strong>{money.format(summary.loss)}</strong></article>}
       </div>
 
       {!summaryOnly && <section className="profitability-panel" aria-labelledby="branch-chart-title">
@@ -249,7 +252,7 @@ export default function ProfitabilityAnalytics({ reports, summaryOnly = false }:
         </div>
         <h4 className="profitability-summary-title">Year to date summary</h4>
         <div className="profitability-summary" aria-label="Year to date profit summary">
-          <article className="profitability-card"><span>Total Profit Year to Date</span><strong>{money.format(yearToDateSummary.total)}</strong></article>
+          <article className="profitability-card"><span>{yearToDateTotalLabel}</span><strong>{money.format(yearToDateSummary.total)}</strong></article>
           <article className="profitability-card"><span>Profitable Branches</span><strong>{money.format(yearToDateSummary.profitable)}</strong></article>
           <article className="profitability-card"><span>Branches Making a Loss</span><strong>{money.format(yearToDateSummary.loss)}</strong></article>
         </div>

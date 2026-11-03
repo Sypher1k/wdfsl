@@ -29,20 +29,14 @@ function reportGroups(m: MembershipMetrics) {
     { id: 'membership', title: 'Bank Membership & Share Capital Status', metrics: [
       ['Total Members', m.totalMembers], ['Savings Members', m.savingsMembers], ['Active Members', m.activeMembers],
       ['A-Type Members', m.aTypeMembers], ['500 Shares Completed', m.sharesCompleted], ['500 Shares Incomplete', m.sharesIncomplete],
-    ] as Metric[], charts: [
-      { title: 'Member profile', items: [['Total Members', m.totalMembers], ['Savings Members', m.savingsMembers], ['Active Members', m.activeMembers], ['A-Type Members', m.aTypeMembers]] as Metric[] },
-      { title: 'Share completion', items: [['Completed', m.sharesCompleted], ['Incomplete', m.sharesIncomplete]] as Metric[] },
-    ] },
+    ] as Metric[], charts: [] },
     { id: 'groups', title: 'Community Group Network & Operational Status', metrics: [
       ['Total Number of Groups', m.totalGroups], ['A Group Count', m.aGroupCount], ['A+ Group Count', m.aPlusGroupCount],
       ['Active Group Count', m.activeGroupCount], ['Inactive Group Count', m.inactiveGroupCount],
-    ] as Metric[], charts: [
-      { title: 'Group classifications', items: [['A Groups', m.aGroupCount], ['A+ Groups', m.aPlusGroupCount]] as Metric[] },
-      { title: 'Operational status', items: [['Active Groups', m.activeGroupCount], ['Inactive Groups', m.inactiveGroupCount]] as Metric[] },
-    ] },
+    ] as Metric[], charts: [] },
     { id: 'societies', title: "Women's Society Network & Classification", metrics: [
       ["Total Women's Societies", m.totalSocieties], ['A Society Count', m.aSocietyCount], ['B Society Count', m.bSocietyCount],
-    ] as Metric[], charts: [{ title: 'Society classification', items: [['A Societies', m.aSocietyCount], ['B Societies', m.bSocietyCount]] as Metric[] }] },
+    ] as Metric[], charts: [] },
   ];
 }
 
@@ -72,7 +66,7 @@ export default function MonthlyCommunityReports({ reports }: { reports: MonthlyR
     {groups.map((group, index) => <section className="community-report-group" key={group.id} aria-labelledby={`community-report-${group.id}`}>
       <div className="community-report-group-heading"><span>0{index + 1}</span><h3 id={`community-report-${group.id}`}>{group.title}</h3></div>
       <MetricCards metrics={group.metrics} />
-      <div className="community-report-charts">{group.charts.map((chart) => <BarChart key={chart.title} {...chart} />)}</div>
+      {group.charts.length > 0 && <div className="community-report-charts">{group.charts.map((chart) => <BarChart key={chart.title} {...chart} />)}</div>}
     </section>)}
     <section className="community-report-group" aria-labelledby="community-report-welfare">
       <div className="community-report-group-heading"><span>04</span><h3 id="community-report-welfare">Community Development &amp; Social Welfare Programmes</h3></div>
