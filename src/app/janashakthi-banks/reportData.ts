@@ -1,6 +1,9 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import type { MonthlyReport } from './ProfitabilityAnalytics';
+import { branchSlug } from './branchSlug';
+
+export { branchSlug } from './branchSlug';
 
 function parseCsvLine(line: string) {
   const fields: string[] = [];
@@ -111,6 +114,3 @@ export function readBranchNames() {
   return readFileSync(join(process.cwd(), 'src/data/branches.csv'), 'utf8').replace(/^\uFEFF/, '').split(/\r?\n/).slice(1).map((name) => name.trim()).filter(Boolean);
 }
 
-export function branchSlug(name: string) {
-  return name.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-}

@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import Link from 'next/link';
+import { branchSlug } from './branchSlug';
 
 export type BranchProfit = {
   name: string;
@@ -146,7 +148,7 @@ export default function ProfitabilityAnalytics({ reports, summaryOnly = false }:
         const width = Math.abs(profit) / chartScale * 49;
         const value = money.format(profit);
         return <div className="profit-chart-row" role="listitem" key={branch.name}>
-          <span className="profit-chart-name">{branch.name}</span>
+          <Link className="profit-chart-name" href={`/janashakthi-banks/${branchSlug(branch.name)}`}>{branch.name}</Link>
           <div className="profit-chart-track" title={`${branch.name}: ${value}`} aria-label={`${branch.name}: ${value}`}>
             <span className="profit-chart-zero" />
             <span className={`profit-chart-bar ${positive ? 'positive' : 'negative'}`} style={{ width: `${width}%`, left: positive ? '50%' : `calc(50% - ${width}%)` }} />
@@ -168,7 +170,7 @@ export default function ProfitabilityAnalytics({ reports, summaryOnly = false }:
           const value = money.format(profit);
           const positive = profit > 0;
           return <div className="profit-chart-row" role="listitem" key={branch.name}>
-            <span className="profit-chart-name">{branch.name}</span>
+            <Link className="profit-chart-name" href={`/janashakthi-banks/${branchSlug(branch.name)}`}>{branch.name}</Link>
             <div className="profit-chart-track" title={`${branch.name}: ${value}`} aria-label={`${branch.name}: ${value}`}>
               <span className="profit-chart-zero" />
               <span className={`profit-chart-bar ${positive ? 'positive' : 'negative'}`} style={{ width: `${width}%`, left: positive ? '50%' : `calc(50% - ${width}%)` }} />
