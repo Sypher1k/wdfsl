@@ -81,6 +81,8 @@ export default function ProfitabilityAnalytics({ reports, summaryOnly = false }:
   const [selectedDivision, setSelectedDivision] = useState('all');
   const [branchDropdownOpen, setBranchDropdownOpen] = useState(false);
   const branchDropdownRef = useRef<HTMLDivElement>(null);
+  const [chartDistrict, setChartDistrict] = useState('all');
+  const [chartDivision, setChartDivision] = useState('all');
   const [sortDirection, setSortDirection] = useState<'desc' | 'asc'>('desc');
   const [selectedFile, setSelectedFile] = useState(reports[0]?.sourceFile ?? '');
   const activeReport = reports.find((report) => report.sourceFile === selectedFile) ?? reports[0]!;
@@ -90,6 +92,8 @@ export default function ProfitabilityAnalytics({ reports, summaryOnly = false }:
   const divisions = useMemo(() => [...new Set(branches.filter((branch) => selectedDistrict === 'all' || branch.district === selectedDistrict).map((branch) => branch.division).filter((value): value is string => Boolean(value)))].sort((a, b) => a.localeCompare(b)), [branches, selectedDistrict]);
   const regionBranches = useMemo(() => branches.filter((branch) => (selectedDistrict === 'all' || branch.district === selectedDistrict) && (selectedDivision === 'all' || branch.division === selectedDivision)), [branches, selectedDistrict, selectedDivision]);
   const branchOptions = useMemo(() => regionBranches.filter((branch) => branch.name.toLowerCase().includes(branchQuery.trim().toLowerCase())).sort((a, b) => a.name.localeCompare(b.name)), [regionBranches, branchQuery]);
+  const chartDivisions = useMemo(() => [...new Set(branches.filter((branch) => chartDistrict === 'all' || branch.district === chartDistrict).map((branch) => branch.division).filter((value): value is string => Boolean(value)))].sort((a, b) => a.localeCompare(b)), [branches, chartDistrict]);
+  const chartRegionBranches = useMemo(() => branches.filter((branch) => (chartDistrict === 'all' || branch.district === chartDistrict) && (chartDivision === 'all' || branch.division === chartDivision)), [branches, chartDistrict, chartDivision]);
 
   const monthlyAvailable = useMemo(() => branches.filter((branch) => branch.monthlyProfit !== null), [branches]);
   const summary = useMemo(() => ({
@@ -106,12 +110,13 @@ export default function ProfitabilityAnalytics({ reports, summaryOnly = false }:
   const monthlyTotalLabel = `Total Monthly ${summary.total < 0 ? 'Loss' : 'Profit'}`;
   const yearToDateTotalLabel = `YTD ${yearToDateSummary.total < 0 ? 'Loss' : 'Profit'}`;
 
-  const profitBranches = useMemo(() => branches
+  const chartBranches = chartRegionBranches;
+  const profitBranches = useMemo(() => chartBranches
     .filter((branch) => branch.monthlyProfit !== null && branch.monthlyProfit > 0)
-    .sort((a, b) => b.monthlyProfit! - a.monthlyProfit!), [branches]);
-  const lossBranches = useMemo(() => branches
+    .sort((a, b) => b.monthlyProfit! - a.monthlyProfit!), [chartBranches]);
+  const lossBranches = useMemo(() => chartBranches
     .filter((branch) => branch.monthlyProfit !== null && branch.monthlyProfit < 0)
-    .sort((a, b) => a.monthlyProfit! - b.monthlyProfit!), [branches]);
+    .sort((a, b) => a.monthlyProfit! - b.monthlyProfit!), [chartBranches]);
   const shownProfitBranches = chartMode === 'top10' ? profitBranches.slice(0, 10) : profitBranches;
   const shownLossBranches = chartMode === 'top10' ? lossBranches.slice(0, 10) : lossBranches;
   const selectedBranchData = branches.find((branch) => branch.name === selectedBranch);
@@ -139,6 +144,23 @@ export default function ProfitabilityAnalytics({ reports, summaryOnly = false }:
   const yearToDateOtherBranches = filteredBranches.filter((branch) => branch.yearToDateProfit === null || branch.yearToDateProfit === 0);
   const chartScale = Math.max(...monthlyAvailable.map((branch) => Math.abs(branch.monthlyProfit!)), 1);
   const yearToDateChartScale = Math.max(...yearToDateAvailable.map((branch) => Math.abs(branch.yearToDateProfit!)), 1);
+  const monthlyTrend = useMemo(() => [...reports].slice(0, 12).reverse().map((report) => {
+    const monthProfit = report.branches.reduce<number | null>((total, branch) => {
+      if (branch.monthlyProfit === null) return total;
+      return (total ?? 0) + branch.monthlyProfit;
+    }, null);
+    return { month: report.reportMonth, profit: monthProfit };
+  }), [reports]);
+  const trendValues = monthlyTrend.map((item) => item.profit).filter((value): value is number => value !== null);
+  const trendMin = Math.min(0, ...trendValues);
+  const trendMax = Math.max(0, ...trendValues);
+  const trendRange = trendMax - trendMin || 1;
+  const trendY = (value: number) => 20 + (trendMax - value) / trendRange * 190;
+  const trendPoints = monthlyTrend.map((item, index) => ({
+    ...item,
+    x: monthlyTrend.length === 1 ? 50 : 50 + index * (700 / (monthlyTrend.length - 1)),
+    y: item.profit === null ? null : trendY(item.profit),
+  }));
 
   useEffect(() => {
     const closeIfOutside = (event: MouseEvent) => {
@@ -219,10 +241,49 @@ export default function ProfitabilityAnalytics({ reports, summaryOnly = false }:
         {!summaryOnly && <article className="profitability-card"><span>Branches Making a Loss</span><strong>{money.format(summary.loss)}</strong></article>}
       </div>
 
+      {summaryOnly && <section className="monthly-profit-trend" aria-labelledby="monthly-profit-trend-title">
+        <div className="profitability-panel-heading">
+          <div><h3 id="monthly-profit-trend-title">Monthly profit · last 12 months</h3><p>Branch monthly profit over time</p></div>
+        </div>
+        {trendValues.length > 0 ? <div className="monthly-profit-chart-wrap">
+          <svg className="monthly-profit-chart" viewBox="0 0 780 260" role="img" aria-label="Line graph of monthly profit for the last 12 months">
+            {[0, 1, 2, 3, 4].map((step) => {
+              const y = 20 + step * 47.5;
+              const value = trendMax - step * trendRange / 4;
+              return <g key={step}>
+                <line x1="50" x2="750" y1={y} y2={y} className="monthly-profit-gridline" />
+                <text x="42" y={y + 4} textAnchor="end" className="monthly-profit-tick">{money.format(value)}</text>
+              </g>;
+            })}
+            {trendPoints.map((point, index) => index > 0 && point.y !== null && trendPoints[index - 1].y !== null ? <line key={`line-${index}`} x1={trendPoints[index - 1].x} y1={trendPoints[index - 1].y!} x2={point.x} y2={point.y} className="monthly-profit-line" /> : null)}
+            {trendPoints.map((point, index) => <g key={`${point.month}-${index}`}>
+              {point.y !== null && <circle cx={point.x} cy={point.y} r="4" className="monthly-profit-point"><title>{point.month.replace('\n', ' ')}: {money.format(point.profit!)}</title></circle>}
+              <text x={point.x} y="232" textAnchor="middle" className="monthly-profit-month">{point.month.split(/\s+/).map((part, partIndex) => <tspan key={part} x={point.x} dy={partIndex === 0 ? 0 : 12}>{part}</tspan>)}</text>
+            </g>)}
+            <text x="400" y="258" textAnchor="middle" className="monthly-profit-axis-title">Month</text>
+            <text transform="translate(12 125) rotate(-90)" textAnchor="middle" className="monthly-profit-axis-title">Monthly profit (LKR)</text>
+          </svg>
+        </div> : <p className="profit-chart-empty">Monthly profit data is unavailable for this branch.</p>}
+      </section>}
+
       {!summaryOnly && <section className="profitability-panel" aria-labelledby="branch-chart-title">
         <div className="profitability-panel-heading">
           <div><h3 id="branch-chart-title">Profit and loss by bank branch</h3><p>Monthly results · profits and losses ranked by amount</p></div>
           <div className="profit-chart-controls">
+            <div className="profit-table-filters">
+              <label className="profit-table-filter">District
+                <select value={chartDistrict} onChange={(event) => { setChartDistrict(event.target.value); setChartDivision('all'); }} aria-label="Filter profit and loss chart by district">
+                  <option value="all">All Districts</option>
+                  {districts.map((district) => <option value={district} key={district}>{district}</option>)}
+                </select>
+              </label>
+              <label className="profit-table-filter">Division
+                <select value={chartDivision} onChange={(event) => setChartDivision(event.target.value)} aria-label="Filter profit and loss chart by division">
+                  <option value="all">All Divisions</option>
+                  {chartDivisions.map((division) => <option value={division} key={division}>{division}</option>)}
+                </select>
+              </label>
+            </div>
             <div className="profitability-toggle" aria-label="Branches shown">
               <button type="button" aria-pressed={chartMode === 'all'} onClick={() => setChartMode('all')}>All branches</button>
               <button type="button" aria-pressed={chartMode === 'top10'} onClick={() => setChartMode('top10')}>Top 10</button>

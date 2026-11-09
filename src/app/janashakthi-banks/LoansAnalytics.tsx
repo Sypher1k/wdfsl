@@ -6,6 +6,39 @@ import type { LoanMetrics, MonthlyReport } from './ProfitabilityAnalytics';
 const number = new Intl.NumberFormat('en-LK', { maximumFractionDigits: 0 });
 const percentage = new Intl.NumberFormat('en-LK', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
+function LoanTrendChart({ title, unit, values }: { title: string; unit: 'LKR' | '%'; values: { month: string; value: number | null }[] }) {
+  const width = 720;
+  const height = 230;
+  const left = 64;
+  const right = 18;
+  const top = 18;
+  const bottom = 38;
+  const chartWidth = width - left - right;
+  const chartHeight = height - top - bottom;
+  const data = values.map(({ value }) => value).filter((value): value is number => value !== null);
+  const max = data.length ? Math.max(...data) : 0;
+  const min = unit === '%' ? Math.min(0, ...data) : 0;
+  const range = max - min || 1;
+  const x = (index: number) => left + (values.length <= 1 ? chartWidth / 2 : index * chartWidth / (values.length - 1));
+  const y = (value: number) => top + (max - value) / range * chartHeight;
+  const path = values.map(({ value }, index) => value === null ? '' : `${index === 0 || values[index - 1]?.value === null ? 'M' : 'L'} ${x(index)} ${y(value)}`).filter(Boolean).join(' ');
+  const ticks = [0, 1, 2, 3].map((tick) => max - tick * range / 3);
+  const formatTick = (value: number) => unit === '%' ? `${percentage.format(value)}%` : `LKR ${number.format(value)}`;
+  return <article className="loan-trend-card">
+    <h3>{title}</h3>
+    <div className="loan-trend-scroll">
+      <svg className="loan-trend-chart" viewBox={`0 0 ${width} ${height}`} role="img" aria-label={`${title} over the last ${values.length} months`}>
+        {ticks.map((tick) => <g key={tick}><line x1={left} x2={width - right} y1={y(tick)} y2={y(tick)} className="loan-trend-grid"/><text x={left - 8} y={y(tick) + 4} textAnchor="end" className="loan-trend-tick">{formatTick(tick)}</text></g>)}
+        {path && <path d={path} className="loan-trend-line"/>}
+        {values.map(({ month, value }, index) => value === null ? null : <circle key={`${month}-${index}`} cx={x(index)} cy={y(value)} r="3.5" className="loan-trend-point"><title>{month}: {formatTick(value)}</title></circle>)}
+        {values.map(({ month }, index) => <text key={month} x={x(index)} y={height - 12} textAnchor="middle" className="loan-trend-month">{month}</text>)}
+      </svg>
+    </div>
+    {!data.length && <p className="loan-trend-empty">No monthly values are available for this period.</p>}
+    <p className="visually-hidden">Monthly values: {values.map(({ month, value }) => `${month}: ${value === null ? 'not reported' : formatTick(value)}`).join('; ')}</p>
+  </article>;
+}
+
 export default function LoansAnalytics({ reports, branchName }: { reports: MonthlyReport[]; branchName?: string }) {
   const [selectedFile, setSelectedFile] = useState(reports[0]?.sourceFile ?? '');
   const [selectedBranch, setSelectedBranch] = useState('all');
@@ -15,6 +48,21 @@ export default function LoansAnalytics({ reports, branchName }: { reports: Month
   const [branchDropdownOpen, setBranchDropdownOpen] = useState(false);
   const branchDropdownRef = useRef<HTMLDivElement>(null);
   const report = reports.find((item) => item.sourceFile === selectedFile) ?? reports[0]!;
+  const trendReports = [...reports].sort((a, b) => a.sourceFile.localeCompare(b.sourceFile)).slice(-12);
+  const reportOrdinal = (reportMonth: string) => {
+    const [monthName, year] = reportMonth.toLowerCase().split(' ');
+    const month = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'].indexOf(monthName ?? '');
+    return month >= 0 && year ? Number(year) * 12 + month : -1;
+  };
+  const latestOrdinal = Math.max(...reports.map((item) => reportOrdinal(item.reportMonth)));
+  const trendMonths = Array.from({ length: 12 }, (_, index) => latestOrdinal - 11 + index);
+  const branchTrendValues = (metric: keyof LoanMetrics) => trendMonths.map((ordinal) => {
+    const item = trendReports.find((candidate) => reportOrdinal(candidate.reportMonth) === ordinal);
+    const branch = item && branchName ? item.branches.find((candidate) => candidate.name.toLowerCase() === branchName.toLowerCase()) : null;
+    const date = new Date(Math.floor(ordinal / 12), ordinal % 12, 1);
+    const month = new Intl.DateTimeFormat('en', { month: 'short' }).format(date);
+    return { month: `${month} ${String(date.getFullYear()).slice(-2)}`, value: item ? branchName ? branch?.loans[metric] ?? null : item.loans[metric] : null };
+  });
   const districts = [...new Set(report.branches.map((branch) => branch.district).filter((value): value is string => Boolean(value)))].sort();
   const divisions = [...new Set(report.branches.filter((branch) => selectedDistrict === 'all' || branch.district === selectedDistrict).map((branch) => branch.division).filter((value): value is string => Boolean(value)))].sort();
   const filteredBranches = report.branches.filter((branch) => (selectedDistrict === 'all' || branch.district === selectedDistrict) && (selectedDivision === 'all' || branch.division === selectedDivision));
@@ -91,6 +139,11 @@ export default function LoansAnalytics({ reports, branchName }: { reports: Month
           <strong>{kind === 'percent' ? `${percentage.format(value ?? 0)}%` : number.format(value ?? 0)}</strong>
         </article>)}
       </div>
+      {branchName && <div className="loan-trends" aria-label="Loan trends for the last 12 months">
+        <LoanTrendChart title="Outstanding Loan Amount" unit="LKR" values={branchTrendValues('outstandingLoanAmount')} />
+        <LoanTrendChart title="Monthly Loan Disbursement" unit="LKR" values={branchTrendValues('monthlyLoanDisbursement')} />
+        <LoanTrendChart title="PAR Percentage" unit="%" values={branchTrendValues('parPercentage')} />
+      </div>}
       <p className="loans-source">Source: {report.sourceFile}. All-branch totals sum reported branch values; blank and dash entries are excluded rather than treated as zero. PAR is calculated as reported At-Risk Loan Amount divided by reported Outstanding Loan Amount because the CSV PAR values are rounded.</p>
     </section>
   );

@@ -5,6 +5,35 @@ import type { MonthlyReport } from './ProfitabilityAnalytics';
 
 const number = new Intl.NumberFormat('en-LK', { maximumFractionDigits: 0 });
 
+function SavingsTrend({ values }: { values: { month: string; value: number | null }[] }) {
+  const width = 780;
+  const height = 260;
+  const left = 92;
+  const right = 24;
+  const top = 22;
+  const bottom = 54;
+  const chartWidth = width - left - right;
+  const chartHeight = height - top - bottom;
+  const available = values.map(({ value }) => value).filter((value): value is number => value !== null);
+  const max = Math.max(0, ...available);
+  const range = max || 1;
+  const x = (index: number) => left + (values.length <= 1 ? chartWidth / 2 : index * chartWidth / (values.length - 1));
+  const y = (value: number) => top + (max - value) / range * chartHeight;
+  const format = (value: number) => number.format(value);
+  const ticks = [0, 1, 2, 3, 4].map((step) => max - step * range / 4);
+  const path = values.map(({ value }, index) => value === null ? '' : `${index === 0 || values[index - 1]?.value === null ? 'M' : 'L'} ${x(index)} ${y(value)}`).filter(Boolean).join(' ');
+  return <section className="monthly-profit-trend savings-trend" aria-labelledby="savings-trend-title">
+    <div className="profitability-panel-heading"><div><h3 id="savings-trend-title">Monthly savings · last 12 months</h3><p>Total savings amount over time</p></div></div>
+    {available.length ? <div className="monthly-profit-chart-wrap"><svg className="monthly-profit-chart" viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Line graph of savings amount by month for the last 12 months">
+      {ticks.map((tick, step) => { const tickY = top + step * chartHeight / 4; return <g key={step}><line x1={left} x2={width - right} y1={tickY} y2={tickY} className="monthly-profit-gridline"/><text x={left - 8} y={tickY + 4} textAnchor="end" className="monthly-profit-tick">{format(tick)}</text></g>; })}
+      {path && <path d={path} className="monthly-profit-line"/>}
+      {values.map(({ month, value }, index) => <g key={`${month}-${index}`}>{value !== null && <circle cx={x(index)} cy={y(value)} r="4" className="monthly-profit-point"><title>{month}: {format(value)}</title></circle>}<text x={x(index)} y={height - 28} textAnchor="middle" className="monthly-profit-month">{month}</text></g>)}
+      <text x={width / 2} y={height - 3} textAnchor="middle" className="monthly-profit-axis-title">Month</text>
+      <text transform={`translate(18 ${height / 2}) rotate(-90)`} textAnchor="middle" className="monthly-profit-axis-title">Savings amount</text>
+    </svg></div> : <p className="profit-chart-empty">Monthly savings data is unavailable for this period.</p>}
+  </section>;
+}
+
 export default function SavingsAnalytics({ reports, branchName }: { reports: MonthlyReport[]; branchName?: string }) {
   const [selectedFile, setSelectedFile] = useState(reports[0]?.sourceFile ?? '');
   const [selectedBranch, setSelectedBranch] = useState('all');
@@ -14,6 +43,13 @@ export default function SavingsAnalytics({ reports, branchName }: { reports: Mon
   const [branchDropdownOpen, setBranchDropdownOpen] = useState(false);
   const branchDropdownRef = useRef<HTMLDivElement>(null);
   const report = reports.find((item) => item.sourceFile === selectedFile) ?? reports[0]!;
+  const trendReports = [...reports].sort((a, b) => a.sourceFile.localeCompare(b.sourceFile)).slice(-12);
+  const trendValues = trendReports.map((item) => {
+    const branch = branchName ? item.branches.find((candidate) => candidate.name.toLowerCase() === branchName.toLowerCase()) : item.branches.find((candidate) => candidate.name === selectedBranch);
+    const scoped = item.branches.filter((candidate) => (selectedDistrict === 'all' || candidate.district === selectedDistrict) && (selectedDivision === 'all' || candidate.division === selectedDivision));
+    const value = branchName || selectedBranch !== 'all' ? branch?.savings.totalSavingsAmount ?? null : selectedDistrict === 'all' && selectedDivision === 'all' ? item.savings.totalSavingsAmount : scoped.reduce<number | null>((sum, candidate) => candidate.savings.totalSavingsAmount === null ? sum : (sum ?? 0) + candidate.savings.totalSavingsAmount, null);
+    return { month: item.reportMonth, value };
+  });
   const districts = [...new Set(report.branches.map((branch) => branch.district).filter((value): value is string => Boolean(value)))].sort();
   const divisions = [...new Set(report.branches.filter((branch) => selectedDistrict === 'all' || branch.district === selectedDistrict).map((branch) => branch.division).filter((value): value is string => Boolean(value)))].sort();
   const filteredBranches = report.branches.filter((branch) => (selectedDistrict === 'all' || branch.district === selectedDistrict) && (selectedDivision === 'all' || branch.division === selectedDivision));
@@ -78,6 +114,7 @@ export default function SavingsAnalytics({ reports, branchName }: { reports: Mon
         <article className="savings-metric"><span>Total Savings Amount</span><strong>{metrics.totalSavingsAmount === null ? 'Data unavailable' : number.format(metrics.totalSavingsAmount)}</strong></article>
         <article className="savings-metric"><span>Savings Members</span><strong>{metrics.savingsMembers === null ? 'Data unavailable' : number.format(metrics.savingsMembers)}</strong></article>
       </div>
+      <SavingsTrend values={trendValues} />
       <p className="savings-source">Source: {report.sourceFile}. All-branch totals sum reported branch values; blank and dash entries are excluded rather than treated as zero. Currency is not specified in the source.</p>
     </section>
   );
