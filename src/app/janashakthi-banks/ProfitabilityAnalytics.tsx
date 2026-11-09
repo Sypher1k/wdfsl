@@ -6,6 +6,8 @@ import { branchSlug } from './branchSlug';
 
 export type BranchProfit = {
   name: string;
+  district?: string;
+  division?: string;
   monthlyProfit: number | null;
   yearToDateProfit: number | null;
   loans: LoanMetrics;
@@ -75,12 +77,19 @@ export default function ProfitabilityAnalytics({ reports, summaryOnly = false }:
   const [chartMode, setChartMode] = useState<'all' | 'top10'>('all');
   const [branchQuery, setBranchQuery] = useState('');
   const [selectedBranch, setSelectedBranch] = useState('all');
+  const [selectedDistrict, setSelectedDistrict] = useState('all');
+  const [selectedDivision, setSelectedDivision] = useState('all');
   const [branchDropdownOpen, setBranchDropdownOpen] = useState(false);
   const branchDropdownRef = useRef<HTMLDivElement>(null);
   const [sortDirection, setSortDirection] = useState<'desc' | 'asc'>('desc');
   const [selectedFile, setSelectedFile] = useState(reports[0]?.sourceFile ?? '');
   const activeReport = reports.find((report) => report.sourceFile === selectedFile) ?? reports[0]!;
   const { branches, reportMonth, sourceFile } = activeReport;
+
+  const districts = useMemo(() => [...new Set(branches.map((branch) => branch.district).filter((value): value is string => Boolean(value)))].sort((a, b) => a.localeCompare(b)), [branches]);
+  const divisions = useMemo(() => [...new Set(branches.filter((branch) => selectedDistrict === 'all' || branch.district === selectedDistrict).map((branch) => branch.division).filter((value): value is string => Boolean(value)))].sort((a, b) => a.localeCompare(b)), [branches, selectedDistrict]);
+  const regionBranches = useMemo(() => branches.filter((branch) => (selectedDistrict === 'all' || branch.district === selectedDistrict) && (selectedDivision === 'all' || branch.division === selectedDivision)), [branches, selectedDistrict, selectedDivision]);
+  const branchOptions = useMemo(() => regionBranches.filter((branch) => branch.name.toLowerCase().includes(branchQuery.trim().toLowerCase())).sort((a, b) => a.name.localeCompare(b.name)), [regionBranches, branchQuery]);
 
   const monthlyAvailable = useMemo(() => branches.filter((branch) => branch.monthlyProfit !== null), [branches]);
   const summary = useMemo(() => ({
@@ -106,17 +115,21 @@ export default function ProfitabilityAnalytics({ reports, summaryOnly = false }:
   const shownProfitBranches = chartMode === 'top10' ? profitBranches.slice(0, 10) : profitBranches;
   const shownLossBranches = chartMode === 'top10' ? lossBranches.slice(0, 10) : lossBranches;
   const selectedBranchData = branches.find((branch) => branch.name === selectedBranch);
-  const visibleBranches = useMemo(() => branches
-    .filter((branch) => branch.name.toLowerCase().includes(branchQuery.trim().toLowerCase()))
-    .sort((a, b) => a.name.localeCompare(b.name)), [branches, branchQuery]);
   const filteredBranches = useMemo(() => {
-    const matching = selectedBranch === 'all' ? branches : branches.filter((branch) => branch.name === selectedBranch);
+    const matching = regionBranches.filter((branch) => selectedBranch === 'all' || branch.name === selectedBranch);
     return [...matching].sort((a, b) => {
       if (a.yearToDateProfit === null) return b.yearToDateProfit === null ? a.name.localeCompare(b.name) : 1;
       if (b.yearToDateProfit === null) return -1;
       return (a.yearToDateProfit - b.yearToDateProfit) * (sortDirection === 'asc' ? 1 : -1);
     });
-  }, [branches, selectedBranch, sortDirection]);
+  }, [regionBranches, selectedBranch, sortDirection]);
+  const tableYearToDateAvailable = filteredBranches.filter((branch) => branch.yearToDateProfit !== null);
+  const tableYearToDateSummary = {
+    total: tableYearToDateAvailable.reduce((sum, branch) => sum + branch.yearToDateProfit!, 0),
+    profitable: tableYearToDateAvailable.filter((branch) => branch.yearToDateProfit! > 0).length,
+    loss: tableYearToDateAvailable.filter((branch) => branch.yearToDateProfit! < 0).length,
+  };
+  const tableYearToDateTotalLabel = `YTD ${tableYearToDateSummary.total < 0 ? 'Loss' : 'Profit'}`;
   const yearToDateProfitBranches = filteredBranches
     .filter((branch) => branch.yearToDateProfit !== null && branch.yearToDateProfit > 0)
     .sort((a, b) => (b.yearToDateProfit! - a.yearToDateProfit!) * (sortDirection === 'desc' ? 1 : -1));
@@ -231,6 +244,19 @@ export default function ProfitabilityAnalytics({ reports, summaryOnly = false }:
       {!summaryOnly && <section className="profitability-table-section" aria-labelledby="branch-table-title">
         <div className="profitability-panel-heading">
           <div><h3 id="branch-table-title">Branch profit table</h3><p>Profit year to date · {filteredBranches.length} bank branches</p></div>
+          <div className="profit-table-filters">
+          <label className="profit-table-filter">District
+            <select value={selectedDistrict} onChange={(event) => { setSelectedDistrict(event.target.value); setSelectedDivision('all'); setSelectedBranch('all'); setBranchQuery(''); setBranchDropdownOpen(false); }} aria-label="Filter branches by district">
+              <option value="all">All Districts</option>
+              {districts.map((district) => <option value={district} key={district}>{district}</option>)}
+            </select>
+          </label>
+          <label className="profit-table-filter">Division
+            <select value={selectedDivision} onChange={(event) => { setSelectedDivision(event.target.value); setSelectedBranch('all'); setBranchQuery(''); setBranchDropdownOpen(false); }} aria-label="Filter branches by division">
+              <option value="all">All Divisions</option>
+              {divisions.map((division) => <option value={division} key={division}>{division}</option>)}
+            </select>
+          </label>
           <div className="loan-branch-filter profit-branch-filter" ref={branchDropdownRef}>
             <span className="loan-filter-label">Branch</span>
             <button className="loan-branch-trigger" type="button" aria-haspopup="listbox" aria-expanded={branchDropdownOpen} aria-label={`Branch filter: ${selectedBranchData ? selectedBranchData.name : 'All Branches'}`} onClick={() => { setBranchDropdownOpen((open) => !open); setBranchQuery(''); }}>
@@ -241,22 +267,23 @@ export default function ProfitabilityAnalytics({ reports, summaryOnly = false }:
                 if (event.key === 'Escape') setBranchDropdownOpen(false);
                 if (event.key === 'Enter') {
                   event.preventDefault();
-                  selectBranch(branchQuery ? visibleBranches[0]?.name ?? 'all' : 'all');
+                  selectBranch(branchQuery ? branchOptions[0]?.name ?? 'all' : 'all');
                 }
               }} /></label>
               <div className="loan-branch-options" role="listbox" aria-label="Available branches">
                 <button type="button" role="option" aria-selected={selectedBranch === 'all'} className={selectedBranch === 'all' ? 'selected' : ''} onClick={() => selectBranch('all')}>All Branches</button>
-                {visibleBranches.map((branch) => <button type="button" role="option" aria-selected={selectedBranch === branch.name} className={selectedBranch === branch.name ? 'selected' : ''} key={branch.name} onClick={() => selectBranch(branch.name)}>{branch.name}</button>)}
-                {visibleBranches.length === 0 && <span className="loan-branch-empty">No branches match.</span>}
+                {branchOptions.map((branch) => <button type="button" role="option" aria-selected={selectedBranch === branch.name} className={selectedBranch === branch.name ? 'selected' : ''} key={branch.name} onClick={() => selectBranch(branch.name)}>{branch.name}</button>)}
+                {branchOptions.length === 0 && <span className="loan-branch-empty">No branches match.</span>}
               </div>
             </div>}
+          </div>
           </div>
         </div>
         <h4 className="profitability-summary-title">Year to date summary</h4>
         <div className="profitability-summary" aria-label="Year to date profit summary">
-          <article className="profitability-card"><span>{yearToDateTotalLabel}</span><strong>{money.format(yearToDateSummary.total)}</strong></article>
-          <article className="profitability-card"><span>Profitable Branches</span><strong>{money.format(yearToDateSummary.profitable)}</strong></article>
-          <article className="profitability-card"><span>Branches Making a Loss</span><strong>{money.format(yearToDateSummary.loss)}</strong></article>
+          <article className="profitability-card"><span>{tableYearToDateTotalLabel}</span><strong>{money.format(tableYearToDateSummary.total)}</strong></article>
+          <article className="profitability-card"><span>Profitable Branches</span><strong>{money.format(tableYearToDateSummary.profitable)}</strong></article>
+          <article className="profitability-card"><span>Branches Making a Loss</span><strong>{money.format(tableYearToDateSummary.loss)}</strong></article>
         </div>
         <div className="profitability-table-columns">
           {renderYearToDateTable('Branches with profits', yearToDateProfitBranches)}

@@ -110,7 +110,35 @@ export function readSummaryReports(): MonthlyReport[] {
   });
 }
 
+export type BranchRecord = {
+  district: string;
+  division: string;
+  name: string;
+  manager: string;
+  phone: string;
+  address: string;
+  email: string;
+};
+
+export function readBranches(): BranchRecord[] {
+  const lines = readFileSync(join(process.cwd(), 'src/data/Janashakthi Bank_Region breakdown.csv'), 'utf8').replace(/^\uFEFF/, '').split(/\r?\n/).filter(Boolean);
+  const headers = parseCsvLine(lines[0] ?? '').map((header) => header.trim());
+  const index = (header: string) => headers.indexOf(header);
+  const columns = {
+    district: index('District'), division: index('Divsion'), name: index('Bank Association'),
+    manager: index('Manager'), phone: index('Phone'), address: index('Address'), email: index('Email'),
+  };
+  if (Object.values(columns).some((column) => column < 0)) throw new Error('The branch region CSV is missing a required column.');
+  return lines.slice(1).map((line) => {
+    const fields = parseCsvLine(line);
+    return {
+      district: fields[columns.district].trim(), division: fields[columns.division].trim(), name: fields[columns.name].trim(),
+      manager: fields[columns.manager].trim(), phone: fields[columns.phone].trim(), address: fields[columns.address].trim(), email: fields[columns.email].trim(),
+    };
+  }).filter((branch) => branch.name);
+}
+
 export function readBranchNames() {
-  return readFileSync(join(process.cwd(), 'src/data/branches.csv'), 'utf8').replace(/^\uFEFF/, '').split(/\r?\n/).slice(1).map((name) => name.trim()).filter(Boolean);
+  return readBranches().map((branch) => branch.name);
 }
 

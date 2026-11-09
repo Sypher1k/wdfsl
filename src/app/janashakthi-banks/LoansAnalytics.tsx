@@ -9,13 +9,18 @@ const percentage = new Intl.NumberFormat('en-LK', { minimumFractionDigits: 2, ma
 export default function LoansAnalytics({ reports, branchName }: { reports: MonthlyReport[]; branchName?: string }) {
   const [selectedFile, setSelectedFile] = useState(reports[0]?.sourceFile ?? '');
   const [selectedBranch, setSelectedBranch] = useState('all');
+  const [selectedDistrict, setSelectedDistrict] = useState('all');
+  const [selectedDivision, setSelectedDivision] = useState('all');
   const [branchQuery, setBranchQuery] = useState('');
   const [branchDropdownOpen, setBranchDropdownOpen] = useState(false);
   const branchDropdownRef = useRef<HTMLDivElement>(null);
   const report = reports.find((item) => item.sourceFile === selectedFile) ?? reports[0]!;
+  const districts = [...new Set(report.branches.map((branch) => branch.district).filter((value): value is string => Boolean(value)))].sort();
+  const divisions = [...new Set(report.branches.filter((branch) => selectedDistrict === 'all' || branch.district === selectedDistrict).map((branch) => branch.division).filter((value): value is string => Boolean(value)))].sort();
+  const filteredBranches = report.branches.filter((branch) => (selectedDistrict === 'all' || branch.district === selectedDistrict) && (selectedDivision === 'all' || branch.division === selectedDivision));
   const selectedBranchData = report.branches.find((branch) => branch.name === selectedBranch);
-  const metricsData: LoanMetrics = selectedBranch === 'all' || !selectedBranchData ? report.loans : selectedBranchData.loans;
-  const visibleBranches = report.branches
+  const metricsData: LoanMetrics = selectedBranch !== 'all' && selectedBranchData ? selectedBranchData.loans : filteredBranches.reduce((totals, branch) => Object.fromEntries(Object.keys(totals).map((key) => { const values = filteredBranches.map((item) => item.loans[key as keyof LoanMetrics]).filter((value): value is number => value !== null); return [key, key === 'parPercentage' ? (totals.outstandingLoanAmount && totals.atRiskLoanAmount ? totals.atRiskLoanAmount / totals.outstandingLoanAmount * 100 : null) : values.length ? values.reduce((sum, value) => sum + value, 0) : null]; })) as LoanMetrics, { ...report.loans });
+  const visibleBranches = filteredBranches
     .filter((branch) => branch.name.toLowerCase().includes(branchQuery.trim().toLowerCase()))
     .sort((a, b) => a.name.localeCompare(b.name));
 
@@ -51,6 +56,7 @@ export default function LoansAnalytics({ reports, branchName }: { reports: Month
           <h2 id="loans-analytics-title">Loans</h2>
         </div>
         <div className="loan-filters">
+          {!branchName && <><label className="profit-month-filter">District<select aria-label="Filter loans by district" value={selectedDistrict} onChange={(event) => { setSelectedDistrict(event.target.value); setSelectedDivision('all'); setSelectedBranch('all'); }}><option value="all">All Districts</option>{districts.map((district) => <option key={district}>{district}</option>)}</select></label><label className="profit-month-filter">Division<select aria-label="Filter loans by division" value={selectedDivision} onChange={(event) => { setSelectedDivision(event.target.value); setSelectedBranch('all'); }}><option value="all">All Divisions</option>{divisions.map((division) => <option key={division}>{division}</option>)}</select></label></>}
           <label className="profit-month-filter">Month
             <select value={report.sourceFile} onChange={(event) => { setSelectedFile(event.target.value); setSelectedBranch('all'); setBranchQuery(''); setBranchDropdownOpen(false); }} aria-label="Filter loan metrics by month">
               {reports.map((item) => <option key={item.sourceFile} value={item.sourceFile}>{item.reportMonth}</option>)}

@@ -3,14 +3,18 @@ import ProfitabilityAnalytics from './ProfitabilityAnalytics';
 import LoansAnalytics from './LoansAnalytics';
 import SavingsAnalytics from './SavingsAnalytics';
 import MembershipAnalytics from './MembershipAnalytics';
-import { readSummaryReports } from './reportData';
+import { readBranches, readSummaryReports } from './reportData';
 import BranchDirectory from './BranchDirectory';
 
 export const metadata = { title: 'Janashakthi Banks' };
 export const dynamic = 'force-dynamic';
 
 export default function BankPage() {
-  const profitabilityReports = readSummaryReports();
+  const regions = new Map<string, { district: string; division: string }>(readBranches().map(({ name, district, division }) => [name, { district, division }]));
+  const profitabilityReports = readSummaryReports().map((report) => ({
+    ...report,
+    branches: report.branches.map((branch) => ({ ...branch, ...regions.get(branch.name) })),
+  }));
   return <PageShell label="JANASHAKTHI BANKS" image={{ src: '/images/wdf-img-4.jpeg', alt: 'Women gathered around records at a community banking meeting' }} title={<>Community finance, <em>built from within.</em></>}>
     <div className="content-grid">
       <div><h3>Purpose</h3><p>The Bank Society objectives include increasing family savings, providing loans for income generation, emergencies and housing, introducing social-security mechanisms, mobilizing members for social participation and bringing women together within a strong economic organization.</p></div>

@@ -8,13 +8,18 @@ const count = new Intl.NumberFormat('en-LK', { maximumFractionDigits: 0 });
 export default function MembershipAnalytics({ reports, branchName }: { reports: MonthlyReport[]; branchName?: string }) {
   const [selectedFile, setSelectedFile] = useState(reports[0]?.sourceFile ?? '');
   const [selectedBranch, setSelectedBranch] = useState('all');
+  const [selectedDistrict, setSelectedDistrict] = useState('all');
+  const [selectedDivision, setSelectedDivision] = useState('all');
   const [branchQuery, setBranchQuery] = useState('');
   const [branchDropdownOpen, setBranchDropdownOpen] = useState(false);
   const branchDropdownRef = useRef<HTMLDivElement>(null);
   const report = reports.find((item) => item.sourceFile === selectedFile) ?? reports[0]!;
+  const districts = [...new Set(report.branches.map((branch) => branch.district).filter((value): value is string => Boolean(value)))].sort();
+  const divisions = [...new Set(report.branches.filter((branch) => selectedDistrict === 'all' || branch.district === selectedDistrict).map((branch) => branch.division).filter((value): value is string => Boolean(value)))].sort();
+  const filteredBranches = report.branches.filter((branch) => (selectedDistrict === 'all' || branch.district === selectedDistrict) && (selectedDivision === 'all' || branch.division === selectedDivision));
   const selectedBranchData = report.branches.find((branch) => branch.name === selectedBranch);
-  const membership = selectedBranchData && selectedBranch !== 'all' ? selectedBranchData.membership : report.membership;
-  const visibleBranches = report.branches
+  const membership = selectedBranchData && selectedBranch !== 'all' ? selectedBranchData.membership : selectedDistrict === 'all' && selectedDivision === 'all' ? report.membership : Object.fromEntries(Object.keys(report.membership).map((key) => { const values = filteredBranches.map((branch) => branch.membership[key as keyof typeof report.membership]).filter((value): value is number => value !== null); return [key, values.length ? values.reduce((sum, value) => sum + value, 0) : null]; })) as typeof report.membership;
+  const visibleBranches = filteredBranches
     .filter((branch) => branch.name.toLowerCase().includes(branchQuery.trim().toLowerCase()))
     .sort((a, b) => a.name.localeCompare(b.name));
   useEffect(() => {
@@ -50,6 +55,7 @@ export default function MembershipAnalytics({ reports, branchName }: { reports: 
           <h2 id="membership-analytics-title">Membership &amp; Society Overview</h2>
         </div>
         <div className="loan-filters membership-filters">
+        {!branchName && <><label className="profit-month-filter">District<select aria-label="Filter membership by district" value={selectedDistrict} onChange={(event) => { setSelectedDistrict(event.target.value); setSelectedDivision('all'); setSelectedBranch('all'); }}><option value="all">All Districts</option>{districts.map((district) => <option key={district}>{district}</option>)}</select></label><label className="profit-month-filter">Division<select aria-label="Filter membership by division" value={selectedDivision} onChange={(event) => { setSelectedDivision(event.target.value); setSelectedBranch('all'); }}><option value="all">All Divisions</option>{divisions.map((division) => <option key={division}>{division}</option>)}</select></label></>}
         <label className="profit-month-filter">Month
           <select value={report.sourceFile} onChange={(event) => { setSelectedFile(event.target.value); setSelectedBranch('all'); setBranchQuery(''); setBranchDropdownOpen(false); }} aria-label="Filter membership statistics by month">
             {reports.map((item) => <option key={item.sourceFile} value={item.sourceFile}>{item.reportMonth}</option>)}

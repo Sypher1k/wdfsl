@@ -8,13 +8,18 @@ const number = new Intl.NumberFormat('en-LK', { maximumFractionDigits: 0 });
 export default function SavingsAnalytics({ reports, branchName }: { reports: MonthlyReport[]; branchName?: string }) {
   const [selectedFile, setSelectedFile] = useState(reports[0]?.sourceFile ?? '');
   const [selectedBranch, setSelectedBranch] = useState('all');
+  const [selectedDistrict, setSelectedDistrict] = useState('all');
+  const [selectedDivision, setSelectedDivision] = useState('all');
   const [branchQuery, setBranchQuery] = useState('');
   const [branchDropdownOpen, setBranchDropdownOpen] = useState(false);
   const branchDropdownRef = useRef<HTMLDivElement>(null);
   const report = reports.find((item) => item.sourceFile === selectedFile) ?? reports[0]!;
+  const districts = [...new Set(report.branches.map((branch) => branch.district).filter((value): value is string => Boolean(value)))].sort();
+  const divisions = [...new Set(report.branches.filter((branch) => selectedDistrict === 'all' || branch.district === selectedDistrict).map((branch) => branch.division).filter((value): value is string => Boolean(value)))].sort();
+  const filteredBranches = report.branches.filter((branch) => (selectedDistrict === 'all' || branch.district === selectedDistrict) && (selectedDivision === 'all' || branch.division === selectedDivision));
   const selectedBranchData = report.branches.find((branch) => branch.name === selectedBranch);
-  const metrics = selectedBranchData && selectedBranch !== 'all' ? selectedBranchData.savings : report.savings;
-  const visibleBranches = report.branches
+  const metrics = selectedBranchData && selectedBranch !== 'all' ? selectedBranchData.savings : selectedDistrict === 'all' && selectedDivision === 'all' ? report.savings : { totalSavingsAmount: filteredBranches.reduce<number | null>((sum, b) => b.savings.totalSavingsAmount === null ? sum : (sum ?? 0) + b.savings.totalSavingsAmount, null), savingsMembers: filteredBranches.reduce<number | null>((sum, b) => b.savings.savingsMembers === null ? sum : (sum ?? 0) + b.savings.savingsMembers, null) };
+  const visibleBranches = filteredBranches
     .filter((branch) => branch.name.toLowerCase().includes(branchQuery.trim().toLowerCase()))
     .sort((a, b) => a.name.localeCompare(b.name));
 
@@ -40,6 +45,7 @@ export default function SavingsAnalytics({ reports, branchName }: { reports: Mon
           <h2 id="savings-analytics-title">Savings</h2>
         </div>
         <div className="loan-filters">
+          {!branchName && <><label className="profit-month-filter">District<select aria-label="Filter savings by district" value={selectedDistrict} onChange={(event) => { setSelectedDistrict(event.target.value); setSelectedDivision('all'); setSelectedBranch('all'); }}><option value="all">All Districts</option>{districts.map((district) => <option key={district}>{district}</option>)}</select></label><label className="profit-month-filter">Division<select aria-label="Filter savings by division" value={selectedDivision} onChange={(event) => { setSelectedDivision(event.target.value); setSelectedBranch('all'); }}><option value="all">All Divisions</option>{divisions.map((division) => <option key={division}>{division}</option>)}</select></label></>}
           <label className="profit-month-filter">Month
             <select value={report.sourceFile} onChange={(event) => { setSelectedFile(event.target.value); setSelectedBranch('all'); setBranchQuery(''); setBranchDropdownOpen(false); }} aria-label="Filter savings metrics by month">
               {reports.map((item) => <option key={item.sourceFile} value={item.sourceFile}>{item.reportMonth}</option>)}
