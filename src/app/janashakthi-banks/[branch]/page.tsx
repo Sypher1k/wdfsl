@@ -5,7 +5,7 @@ import LoansAnalytics from '../LoansAnalytics';
 import SavingsAnalytics from '../SavingsAnalytics';
 import MembershipAnalytics from '../MembershipAnalytics';
 import MonthlyCommunityReports from '../MonthlyCommunityReports';
-import { branchSlug, readBranches, readBranchNames, readSummaryReports } from '../reportData';
+import { branchSlug, readBranches, readBranchNames, readInsuranceYtd, readSummaryReports } from '../reportData';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,6 +21,9 @@ export default async function BankBranchPage({ params }: { params: Promise<{ bra
   const branchContact = readBranches().find((candidate) => branchSlug(candidate.name) === branchParam);
   if (!branchContact) notFound();
   const branchName = branchContact.name;
+  const insuranceSummary = readInsuranceYtd(branchName);
+  const amountFormat = new Intl.NumberFormat('en-LK', { maximumFractionDigits: 2 });
+  const quantityFormat = new Intl.NumberFormat('en-LK', { maximumFractionDigits: 0 });
 
   const reports = readSummaryReports().map((report) => {
     const branch = report.branches.find((item) => item.name.toLowerCase() === branchName.toLowerCase());
@@ -43,6 +46,17 @@ export default async function BankBranchPage({ params }: { params: Promise<{ bra
       <div className="branch-map">
         <iframe title={`Map to ${branchName} branch`} src={`https://maps.google.com/maps?q=${encodeURIComponent(`${branchName}, Sri Lanka`)}&output=embed`} loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
       </div>
+    </section>
+    <section className="insurance-ytd" aria-labelledby="insurance-ytd-title">
+      <div className="section-label">YEAR TO DATE</div>
+      <h2 id="insurance-ytd-title">Insurance Summary</h2>
+      {insuranceSummary.length ? <div className="insurance-ytd-grid">
+        {insuranceSummary.map(({ label, value, kind }) => <article className="insurance-ytd-card" key={label}>
+          <span>{label}</span>
+          <strong>{value === null ? 'Data unavailable' : kind === 'amount' ? `LKR ${amountFormat.format(value)}` : quantityFormat.format(value)}</strong>
+        </article>)}
+      </div> : <p className="insurance-ytd-empty">No year to date insurance data is available for this branch.</p>}
+      <p className="insurance-ytd-source">Source: insurance_report_ytd.csv</p>
     </section>
     <ProfitabilityAnalytics reports={reports} summaryOnly />
     <LoansAnalytics reports={reports} branchName={branchName} />

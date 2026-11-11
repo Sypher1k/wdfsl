@@ -142,3 +142,20 @@ export function readBranchNames() {
   return readBranches().map((branch) => branch.name);
 }
 
+export type InsuranceYtdMetric = { label: string; value: number | null; kind: 'quantity' | 'amount' };
+
+export function readInsuranceYtd(branchName: string): InsuranceYtdMetric[] {
+  const lines = readFileSync(join(process.cwd(), 'src/data/insurance_report_ytd.csv'), 'utf8').replace(/^\uFEFF/, '').split(/\r?\n/).filter(Boolean);
+  const headers = parseCsvLine(lines[0] ?? '').map((header) => header.trim());
+  const bankColumn = headers.indexOf('Bank Name');
+  if (bankColumn < 0) throw new Error('The insurance YTD CSV is missing the Bank Name column.');
+  const row = lines.slice(1).map(parseCsvLine).find((fields) => fields[bankColumn]?.trim().toLowerCase() === branchName.toLowerCase());
+  if (!row) return [];
+  return headers.flatMap((header, index) => {
+    if (header === 'No' || index === bankColumn) return [];
+    const isQuantity = /quantity/i.test(header);
+    const label = header === 'Amount (Rs.)' ? 'Divisarana Amount' : header.replace(/\s*\(Rs\.\)/i, '').trim();
+    return [{ label, value: parseAmount(row[index]), kind: isQuantity ? 'quantity' as const : 'amount' as const }];
+  });
+}
+
