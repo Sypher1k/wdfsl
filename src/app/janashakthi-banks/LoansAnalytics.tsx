@@ -15,13 +15,13 @@ function LoanTrendChart({ title, unit, values }: { title: string; unit: 'LKR' | 
   const bottom = 38;
   const chartWidth = width - left - right;
   const chartHeight = height - top - bottom;
-  const data = values.map(({ value }) => value).filter((value): value is number => value !== null);
+  const plottedValues = values.filter((item): item is { month: string; value: number } => item.value !== null);
+  const data = plottedValues.map(({ value }) => value);
   const max = data.length ? Math.max(...data) : 0;
   const min = unit === '%' ? Math.min(0, ...data) : 0;
   const range = max - min || 1;
-  const x = (index: number) => left + (values.length <= 1 ? chartWidth / 2 : index * chartWidth / (values.length - 1));
+  const x = (index: number) => left + (plottedValues.length <= 1 ? chartWidth / 2 : index * chartWidth / (plottedValues.length - 1));
   const y = (value: number) => top + (max - value) / range * chartHeight;
-  const path = values.map(({ value }, index) => value === null ? '' : `${index === 0 || values[index - 1]?.value === null ? 'M' : 'L'} ${x(index)} ${y(value)}`).filter(Boolean).join(' ');
   const ticks = [0, 1, 2, 3].map((tick) => max - tick * range / 3);
   const formatTick = (value: number) => unit === '%' ? `${percentage.format(value)}%` : `LKR ${number.format(value)}`;
   return <article className="loan-trend-card">
@@ -29,9 +29,8 @@ function LoanTrendChart({ title, unit, values }: { title: string; unit: 'LKR' | 
     <div className="loan-trend-scroll">
       <svg className="loan-trend-chart" viewBox={`0 0 ${width} ${height}`} role="img" aria-label={`${title} over the last ${values.length} months`}>
         {ticks.map((tick) => <g key={tick}><line x1={left} x2={width - right} y1={y(tick)} y2={y(tick)} className="loan-trend-grid"/><text x={left - 8} y={y(tick) + 4} textAnchor="end" className="loan-trend-tick">{formatTick(tick)}</text></g>)}
-        {path && <path d={path} className="loan-trend-line"/>}
-        {values.map(({ month, value }, index) => value === null ? null : <circle key={`${month}-${index}`} cx={x(index)} cy={y(value)} r="3.5" className="loan-trend-point"><title>{month}: {formatTick(value)}</title></circle>)}
-        {values.map(({ month }, index) => <text key={month} x={x(index)} y={height - 12} textAnchor="middle" className="loan-trend-month">{month}</text>)}
+        {plottedValues.map(({ month, value }, index) => <rect key={`${month}-${index}`} x={x(index) - 14} y={Math.min(y(value), y(0))} width="28" height={Math.max(Math.abs(y(value) - y(0)), 1)} className="loan-trend-bar"><title>{month}: {formatTick(value)}</title></rect>)}
+        {plottedValues.map(({ month }, index) => <text key={month} x={x(index)} y={height - 12} textAnchor="middle" className="loan-trend-month">{month}</text>)}
       </svg>
     </div>
     {!data.length && <p className="loan-trend-empty">No monthly values are available for this period.</p>}

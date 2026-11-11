@@ -14,20 +14,19 @@ function SavingsTrend({ values }: { values: { month: string; value: number | nul
   const bottom = 54;
   const chartWidth = width - left - right;
   const chartHeight = height - top - bottom;
-  const available = values.map(({ value }) => value).filter((value): value is number => value !== null);
+  const plottedValues = values.filter((item): item is { month: string; value: number } => item.value !== null);
+  const available = plottedValues.map(({ value }) => value);
   const max = Math.max(0, ...available);
   const range = max || 1;
-  const x = (index: number) => left + (values.length <= 1 ? chartWidth / 2 : index * chartWidth / (values.length - 1));
+  const x = (index: number) => left + (plottedValues.length <= 1 ? chartWidth / 2 : index * chartWidth / (plottedValues.length - 1));
   const y = (value: number) => top + (max - value) / range * chartHeight;
   const format = (value: number) => number.format(value);
   const ticks = [0, 1, 2, 3, 4].map((step) => max - step * range / 4);
-  const path = values.map(({ value }, index) => value === null ? '' : `${index === 0 || values[index - 1]?.value === null ? 'M' : 'L'} ${x(index)} ${y(value)}`).filter(Boolean).join(' ');
   return <section className="monthly-profit-trend savings-trend" aria-labelledby="savings-trend-title">
     <div className="profitability-panel-heading"><div><h3 id="savings-trend-title">Monthly savings · last 12 months</h3><p>Total savings amount over time</p></div></div>
-    {available.length ? <div className="monthly-profit-chart-wrap"><svg className="monthly-profit-chart" viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Line graph of savings amount by month for the last 12 months">
+    {available.length ? <div className="monthly-profit-chart-wrap"><svg className="monthly-profit-chart" viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Bar graph of savings amount by month for the last 12 months">
       {ticks.map((tick, step) => { const tickY = top + step * chartHeight / 4; return <g key={step}><line x1={left} x2={width - right} y1={tickY} y2={tickY} className="monthly-profit-gridline"/><text x={left - 8} y={tickY + 4} textAnchor="end" className="monthly-profit-tick">{format(tick)}</text></g>; })}
-      {path && <path d={path} className="monthly-profit-line"/>}
-      {values.map(({ month, value }, index) => <g key={`${month}-${index}`}>{value !== null && <circle cx={x(index)} cy={y(value)} r="4" className="monthly-profit-point"><title>{month}: {format(value)}</title></circle>}<text x={x(index)} y={height - 28} textAnchor="middle" className="monthly-profit-month">{month}</text></g>)}
+      {plottedValues.map(({ month, value }, index) => <g key={`${month}-${index}`}><rect x={x(index) - 14} y={y(value)} width="28" height={Math.max(chartHeight - (y(value) - top), 1)} className="monthly-profit-bar"><title>{month}: {format(value)}</title></rect><text x={x(index)} y={height - 28} textAnchor="middle" className="monthly-profit-month">{month}</text></g>)}
       <text x={width / 2} y={height - 3} textAnchor="middle" className="monthly-profit-axis-title">Month</text>
       <text transform={`translate(18 ${height / 2}) rotate(-90)`} textAnchor="middle" className="monthly-profit-axis-title">Savings amount</text>
     </svg></div> : <p className="profit-chart-empty">Monthly savings data is unavailable for this period.</p>}
