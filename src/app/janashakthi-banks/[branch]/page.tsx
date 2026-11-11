@@ -22,6 +22,10 @@ export default async function BankBranchPage({ params }: { params: Promise<{ bra
   if (!branchContact) notFound();
   const branchName = branchContact.name;
   const insuranceSummary = readInsuranceYtd(branchName);
+  const insuranceGroups = (['Treasurers Insurance', 'Divisarana Insurance'] as const)
+    .map((group) => ({ group, metrics: insuranceSummary.filter((metric) => metric.group === group) }))
+    .filter(({ metrics }) => metrics.length > 0);
+  const otherInsuranceMetrics = insuranceSummary.filter((metric) => metric.group === null);
   const amountFormat = new Intl.NumberFormat('en-LK', { maximumFractionDigits: 2 });
   const quantityFormat = new Intl.NumberFormat('en-LK', { maximumFractionDigits: 0 });
 
@@ -50,12 +54,19 @@ export default async function BankBranchPage({ params }: { params: Promise<{ bra
     <section className="insurance-ytd" aria-labelledby="insurance-ytd-title">
       <div className="section-label">YEAR TO DATE</div>
       <h2 id="insurance-ytd-title">Insurance Summary</h2>
-      {insuranceSummary.length ? <div className="insurance-ytd-grid">
-        {insuranceSummary.map(({ label, value, kind }) => <article className="insurance-ytd-card" key={label}>
+      {insuranceSummary.length ? <>
+        <div className="insurance-ytd-groups">{insuranceGroups.map(({ group, metrics }) => <article className="insurance-ytd-group-card" key={group}>
+          <h3>{group}</h3>
+          <div className="insurance-ytd-group-metrics">{metrics.map(({ label, value, kind }) => <div className="insurance-ytd-group-metric" key={label}>
+            <span>{label}</span>
+            <strong>{value === null ? (kind === 'amount' ? 'LKR 0' : '0') : kind === 'amount' ? `LKR ${amountFormat.format(value)}` : quantityFormat.format(value)}</strong>
+          </div>)}</div>
+        </article>)}</div>
+        {otherInsuranceMetrics.length > 0 && <div className="insurance-ytd-other-grid">{otherInsuranceMetrics.map(({ label, value, kind }) => <article className="insurance-ytd-card" key={label}>
           <span>{label}</span>
-          <strong>{value === null ? 'Data unavailable' : kind === 'amount' ? `LKR ${amountFormat.format(value)}` : quantityFormat.format(value)}</strong>
-        </article>)}
-      </div> : <p className="insurance-ytd-empty">No year to date insurance data is available for this branch.</p>}
+          <strong>{value === null ? (kind === 'amount' ? 'LKR 0' : '0') : kind === 'amount' ? `LKR ${amountFormat.format(value)}` : quantityFormat.format(value)}</strong>
+        </article>)}</div>}
+      </> : <p className="insurance-ytd-empty">No year to date insurance data is available for this branch.</p>}
       <p className="insurance-ytd-source">Source: insurance_report_ytd.csv</p>
     </section>
     <ProfitabilityAnalytics reports={reports} summaryOnly />

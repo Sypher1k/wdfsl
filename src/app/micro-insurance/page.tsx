@@ -2,11 +2,15 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import ResponsiveImage from '@/components/ResponsiveImage';
 import Arrow from '@/components/Arrow';
+import { readBranches, readInsuranceYtdReports } from '../janashakthi-banks/reportData';
+import InsuranceYtdSummary from './InsuranceYtdSummary';
 
 export const metadata: Metadata = {
   title: 'Micro Insurance',
   description: 'Learn about WDF’s community-based approach to social security and how to enquire about available insurance services.',
 };
+
+export const dynamic = 'force-dynamic';
 
 const faqs = [
   {
@@ -32,6 +36,15 @@ const faqs = [
 ];
 
 export default function MicroInsurancePage() {
+  const insuranceReports = readInsuranceYtdReports();
+  const insuranceByBranch = new Map(insuranceReports.map((report) => [report.branchName.toLowerCase(), report.metrics]));
+  const insuranceBranches = readBranches().map((branch) => ({
+    name: branch.name,
+    district: branch.district,
+    division: branch.division,
+    metrics: insuranceByBranch.get(branch.name.toLowerCase()) ?? [],
+  }));
+
   return (
     <main className="page micro-insurance">
       <section className="micro-hero">
@@ -45,6 +58,8 @@ export default function MicroInsurancePage() {
         </div>
         <div className="micro-hero-image"><ResponsiveImage src="/images/wdf-img-21.jpeg" alt="Women members meeting and sharing together in their community" /></div>
       </section>
+
+      <InsuranceYtdSummary branches={insuranceBranches} />
 
       <section className="section micro-introduction">
         <div className="section-label">01 / WHY PROTECTION MATTERS</div>

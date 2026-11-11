@@ -142,20 +142,27 @@ export function readBranchNames() {
   return readBranches().map((branch) => branch.name);
 }
 
-export type InsuranceYtdMetric = { label: string; value: number | null; kind: 'quantity' | 'amount' };
+export type InsuranceYtdMetric = { label: string; value: number | null; kind: 'quantity' | 'amount'; group: 'Treasurers Insurance' | 'Divisarana Insurance' | null };
 
-export function readInsuranceYtd(branchName: string): InsuranceYtdMetric[] {
+export function readInsuranceYtdReports(): { branchName: string; metrics: InsuranceYtdMetric[] }[] {
   const lines = readFileSync(join(process.cwd(), 'src/data/insurance_report_ytd.csv'), 'utf8').replace(/^\uFEFF/, '').split(/\r?\n/).filter(Boolean);
   const headers = parseCsvLine(lines[0] ?? '').map((header) => header.trim());
   const bankColumn = headers.indexOf('Bank Name');
   if (bankColumn < 0) throw new Error('The insurance YTD CSV is missing the Bank Name column.');
-  const row = lines.slice(1).map(parseCsvLine).find((fields) => fields[bankColumn]?.trim().toLowerCase() === branchName.toLowerCase());
-  if (!row) return [];
-  return headers.flatMap((header, index) => {
-    if (header === 'No' || index === bankColumn) return [];
-    const isQuantity = /quantity/i.test(header);
-    const label = header === 'Amount (Rs.)' ? 'Divisarana Amount' : header.replace(/\s*\(Rs\.\)/i, '').trim();
-    return [{ label, value: parseAmount(row[index]), kind: isQuantity ? 'quantity' as const : 'amount' as const }];
-  });
+  return lines.slice(1).map(parseCsvLine).filter((row) => row[bankColumn]?.trim()).map((row) => ({
+    branchName: row[bankColumn].trim(),
+    metrics: headers.flatMap((header, index) => {
+      if (header === 'No' || index === bankColumn) return [];
+      const isQuantity = /quantity/i.test(header);
+      const group = /Treasurers Insurance/i.test(header) ? 'Treasurers Insurance' as const : /Divisarana Insurance/i.test(header) || header === 'Amount (Rs.)' ? 'Divisarana Insurance' as const : null;
+      const baseLabel = header === 'Amount (Rs.)' ? 'Amount' : header.replace(/^(Treasurers|Divisarana) Insurance\s*/i, '').replace(/\s*\(Rs\.\)/i, '').trim();
+      const label = group ? baseLabel : baseLabel.replace(/\s+Amount$/i, '');
+      return [{ label, value: parseAmount(row[index]), kind: isQuantity ? 'quantity' as const : 'amount' as const, group }];
+    }),
+  }));
+}
+
+export function readInsuranceYtd(branchName: string): InsuranceYtdMetric[] {
+  return readInsuranceYtdReports().find((item) => item.branchName.toLowerCase() === branchName.toLowerCase())?.metrics ?? [];
 }
 
