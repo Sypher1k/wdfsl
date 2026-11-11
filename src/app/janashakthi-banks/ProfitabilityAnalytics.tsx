@@ -268,7 +268,7 @@ export default function ProfitabilityAnalytics({ reports, summaryOnly = false }:
               </g>;
             })}
             {trendPoints.map((point, index) => <g key={`${point.month}-${index}`}>
-              <rect x={point.x - 14} y={Math.min(point.y!, trendZeroY)} width="28" height={Math.max(Math.abs(point.y! - trendZeroY), 1)} className="monthly-profit-bar"><title>{point.month.replace('\n', ' ')}: {money.format(point.profit!)}</title></rect>
+              <rect x={point.x - 14} y={Math.min(point.y!, trendZeroY)} width="28" height={Math.max(Math.abs(point.y! - trendZeroY), 1)} className="monthly-profit-bar"><title>{`${point.month.replace('\n', ' ')}: ${money.format(point.profit!)}`}</title></rect>
               <text x={point.x} y="232" textAnchor="middle" className="monthly-profit-month">{point.month.split(/\s+/).map((part, partIndex) => <tspan key={part} x={point.x} dy={partIndex === 0 ? 0 : 12}>{part}</tspan>)}</text>
             </g>)}
             <text x="400" y="258" textAnchor="middle" className="monthly-profit-axis-title">Month</text>

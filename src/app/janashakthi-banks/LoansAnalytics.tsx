@@ -29,7 +29,7 @@ function LoanTrendChart({ title, unit, values }: { title: string; unit: 'LKR' | 
     <div className="loan-trend-scroll">
       <svg className="loan-trend-chart" viewBox={`0 0 ${width} ${height}`} role="img" aria-label={`${title} over the last ${values.length} months`}>
         {ticks.map((tick) => <g key={tick}><line x1={left} x2={width - right} y1={y(tick)} y2={y(tick)} className="loan-trend-grid"/><text x={left - 8} y={y(tick) + 4} textAnchor="end" className="loan-trend-tick">{formatTick(tick)}</text></g>)}
-        {plottedValues.map(({ month, value }, index) => <rect key={`${month}-${index}`} x={x(index) - 14} y={Math.min(y(value), y(0))} width="28" height={Math.max(Math.abs(y(value) - y(0)), 1)} className="loan-trend-bar"><title>{month}: {formatTick(value)}</title></rect>)}
+        {plottedValues.map(({ month, value }, index) => <rect key={`${month}-${index}`} x={x(index) - 14} y={Math.min(y(value), y(0))} width="28" height={Math.max(Math.abs(y(value) - y(0)), 1)} className="loan-trend-bar"><title>{`${month}: ${formatTick(value)}`}</title></rect>)}
         {plottedValues.map(({ month }, index) => <text key={month} x={x(index)} y={height - 12} textAnchor="middle" className="loan-trend-month">{month}</text>)}
       </svg>
     </div>
