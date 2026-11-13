@@ -14,7 +14,7 @@ type CommunityReportGroup = {
 
 function MetricCards({ metrics }: { metrics: Metric[] }) {
   return <div className="community-report-metrics">{metrics.map(([label, value]) => <article className="community-report-metric" key={label}>
-    <span>{label}</span><strong>{value === null ? 'Data unavailable' : count.format(value)}</strong>
+    <span>{label}</span><strong>{count.format(value ?? 0)}</strong>
   </article>)}</div>;
 }
 
@@ -25,7 +25,7 @@ function BarChart({ title, items }: { title: string; items: Metric[] }) {
     <h4>{title}</h4>
     {items.map(([label, value]) => <div className="community-report-bar-row" key={label}>
       <span>{label}</span><div className="community-report-track" aria-hidden="true"><i style={{ width: value === null ? '0%' : `${Math.max(value / max * 100, value > 0 ? 1 : 0)}%` }} /></div>
-      <b>{value === null ? 'Unavailable' : count.format(value)}</b>
+      <b>{count.format(value ?? 0)}</b>
     </div>)}
   </div>;
 }
@@ -80,6 +80,6 @@ export default function MonthlyCommunityReports({ reports }: { reports: MonthlyR
         <h4>{group.title}</h4><MetricCards metrics={group.metrics(report.membership)} />
       </article>)}</div>
     </section>
-    <p className="community-report-source">Source: <span>{report.sourceFile}</span>. Blank and dash entries are shown as unavailable; reported zeroes remain zero.</p>
+    <p className="community-report-source">Source: <span>{report.sourceFile}</span>. Blank and dash entries are shown as zero.</p>
   </section>;
 }

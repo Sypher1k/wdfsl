@@ -90,13 +90,14 @@ export default function ProfitabilityAnalytics({ reports, summaryOnly = false }:
   const divisions = useMemo(() => [...new Set(branches.filter((branch) => selectedDistrict === 'all' || branch.district === selectedDistrict).map((branch) => branch.division).filter((value): value is string => Boolean(value)))].sort((a, b) => a.localeCompare(b)), [branches, selectedDistrict]);
   const regionBranches = useMemo(() => branches.filter((branch) => (selectedDistrict === 'all' || branch.district === selectedDistrict) && (selectedDivision === 'all' || branch.division === selectedDivision)), [branches, selectedDistrict, selectedDivision]);
   const branchOptions = useMemo(() => regionBranches.filter((branch) => branch.name.toLowerCase().includes(branchQuery.trim().toLowerCase())).sort((a, b) => a.name.localeCompare(b.name)), [regionBranches, branchQuery]);
-  const monthlyAvailable = useMemo(() => regionBranches.filter((branch) => branch.monthlyProfit !== null), [regionBranches]);
+  const selectedBranches = useMemo(() => regionBranches.filter((branch) => selectedBranch === 'all' || branch.name === selectedBranch), [regionBranches, selectedBranch]);
+  const monthlyAvailable = useMemo(() => selectedBranches.filter((branch) => branch.monthlyProfit !== null), [selectedBranches]);
   const summary = useMemo(() => ({
     total: monthlyAvailable.reduce((sum, branch) => sum + branch.monthlyProfit!, 0),
     profitable: monthlyAvailable.filter((branch) => branch.monthlyProfit! > 0).length,
     loss: monthlyAvailable.filter((branch) => branch.monthlyProfit! < 0).length,
   }), [monthlyAvailable]);
-  const yearToDateAvailable = useMemo(() => branches.filter((branch) => branch.yearToDateProfit !== null), [branches]);
+  const yearToDateAvailable = useMemo(() => selectedBranches.filter((branch) => branch.yearToDateProfit !== null), [selectedBranches]);
   const yearToDateSummary = useMemo(() => ({
     total: yearToDateAvailable.reduce((sum, branch) => sum + branch.yearToDateProfit!, 0),
     profitable: yearToDateAvailable.filter((branch) => branch.yearToDateProfit! > 0).length,
@@ -105,7 +106,7 @@ export default function ProfitabilityAnalytics({ reports, summaryOnly = false }:
   const monthlyTotalLabel = `Total Monthly ${summary.total < 0 ? 'Loss' : 'Profit'}`;
   const yearToDateTotalLabel = `YTD ${yearToDateSummary.total < 0 ? 'Loss' : 'Profit'}`;
 
-  const chartBranches = regionBranches;
+  const chartBranches = selectedBranches;
   const profitBranches = useMemo(() => chartBranches
     .filter((branch) => branch.monthlyProfit !== null && branch.monthlyProfit > 0)
     .sort((a, b) => b.monthlyProfit! - a.monthlyProfit!), [chartBranches]);
@@ -116,13 +117,12 @@ export default function ProfitabilityAnalytics({ reports, summaryOnly = false }:
   const shownLossBranches = chartMode === 'top10' ? lossBranches.slice(0, 10) : lossBranches;
   const selectedBranchData = branches.find((branch) => branch.name === selectedBranch);
   const filteredBranches = useMemo(() => {
-    const matching = regionBranches.filter((branch) => selectedBranch === 'all' || branch.name === selectedBranch);
-    return [...matching].sort((a, b) => {
+    return [...selectedBranches].sort((a, b) => {
       if (a.yearToDateProfit === null) return b.yearToDateProfit === null ? a.name.localeCompare(b.name) : 1;
       if (b.yearToDateProfit === null) return -1;
       return (a.yearToDateProfit - b.yearToDateProfit) * (sortDirection === 'asc' ? 1 : -1);
     });
-  }, [regionBranches, selectedBranch, sortDirection]);
+  }, [selectedBranches, sortDirection]);
   const tableYearToDateAvailable = filteredBranches.filter((branch) => branch.yearToDateProfit !== null);
   const tableYearToDateSummary = {
     total: tableYearToDateAvailable.reduce((sum, branch) => sum + branch.yearToDateProfit!, 0),
@@ -237,6 +237,26 @@ export default function ProfitabilityAnalytics({ reports, summaryOnly = false }:
                 {divisions.map((division) => <option value={division} key={division}>{division}</option>)}
               </select>
             </label>
+            <div className="loan-branch-filter profit-branch-filter" ref={branchDropdownRef}>
+              <span className="loan-filter-label">Branch</span>
+              <button className="loan-branch-trigger" type="button" aria-haspopup="listbox" aria-expanded={branchDropdownOpen} aria-label={`Branch filter: ${selectedBranchData ? selectedBranchData.name : 'All Branches'}`} onClick={() => { setBranchDropdownOpen((open) => !open); setBranchQuery(''); }}>
+                <span>{selectedBranchData ? selectedBranchData.name : 'All Branches'}</span><span aria-hidden="true">⌄</span>
+              </button>
+              {branchDropdownOpen && <div className="loan-branch-menu">
+                <label className="loan-branch-menu-search"><span className="visually-hidden">Search branches</span><input autoFocus type="search" value={branchQuery} onChange={(event) => setBranchQuery(event.target.value)} placeholder="Type to filter branches" onKeyDown={(event) => {
+                  if (event.key === 'Escape') setBranchDropdownOpen(false);
+                  if (event.key === 'Enter') {
+                    event.preventDefault();
+                    selectBranch(branchQuery ? branchOptions[0]?.name ?? 'all' : 'all');
+                  }
+                }} /></label>
+                <div className="loan-branch-options" role="listbox" aria-label="Available branches">
+                  <button type="button" role="option" aria-selected={selectedBranch === 'all'} className={selectedBranch === 'all' ? 'selected' : ''} onClick={() => selectBranch('all')}>All Branches</button>
+                  {branchOptions.map((branch) => <button type="button" role="option" aria-selected={selectedBranch === branch.name} className={selectedBranch === branch.name ? 'selected' : ''} key={branch.name} onClick={() => selectBranch(branch.name)}>{branch.name}</button>)}
+                  {branchOptions.length === 0 && <span className="loan-branch-empty">No branches match.</span>}
+                </div>
+              </div>}
+            </div>
           </>}
           <label className="profit-month-filter">Month
             <select value={sourceFile} onChange={(event) => { setSelectedFile(event.target.value); setSelectedBranch('all'); setBranchQuery(''); setBranchDropdownOpen(false); }} aria-label="Filter profitability by month">
@@ -302,28 +322,6 @@ export default function ProfitabilityAnalytics({ reports, summaryOnly = false }:
       {!summaryOnly && <section className="profitability-table-section" aria-labelledby="branch-table-title">
         <div className="profitability-panel-heading">
           <div><h3 id="branch-table-title">Branch profit table</h3><p>Profit year to date · {filteredBranches.length} bank branches</p></div>
-          <div className="profit-table-filters">
-          <div className="loan-branch-filter profit-branch-filter" ref={branchDropdownRef}>
-            <span className="loan-filter-label">Branch</span>
-            <button className="loan-branch-trigger" type="button" aria-haspopup="listbox" aria-expanded={branchDropdownOpen} aria-label={`Branch filter: ${selectedBranchData ? selectedBranchData.name : 'All Branches'}`} onClick={() => { setBranchDropdownOpen((open) => !open); setBranchQuery(''); }}>
-              <span>{selectedBranchData ? selectedBranchData.name : 'All Branches'}</span><span aria-hidden="true">⌄</span>
-            </button>
-            {branchDropdownOpen && <div className="loan-branch-menu">
-              <label className="loan-branch-menu-search"><span className="visually-hidden">Search branches</span><input autoFocus type="search" value={branchQuery} onChange={(event) => setBranchQuery(event.target.value)} placeholder="Type to filter branches" onKeyDown={(event) => {
-                if (event.key === 'Escape') setBranchDropdownOpen(false);
-                if (event.key === 'Enter') {
-                  event.preventDefault();
-                  selectBranch(branchQuery ? branchOptions[0]?.name ?? 'all' : 'all');
-                }
-              }} /></label>
-              <div className="loan-branch-options" role="listbox" aria-label="Available branches">
-                <button type="button" role="option" aria-selected={selectedBranch === 'all'} className={selectedBranch === 'all' ? 'selected' : ''} onClick={() => selectBranch('all')}>All Branches</button>
-                {branchOptions.map((branch) => <button type="button" role="option" aria-selected={selectedBranch === branch.name} className={selectedBranch === branch.name ? 'selected' : ''} key={branch.name} onClick={() => selectBranch(branch.name)}>{branch.name}</button>)}
-                {branchOptions.length === 0 && <span className="loan-branch-empty">No branches match.</span>}
-              </div>
-            </div>}
-          </div>
-          </div>
         </div>
         <h4 className="profitability-summary-title">Year to date summary</h4>
         <div className="profitability-summary" aria-label="Year to date profit summary">
