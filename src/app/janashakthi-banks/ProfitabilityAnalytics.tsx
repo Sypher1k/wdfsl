@@ -277,8 +277,8 @@ export default function ProfitabilityAnalytics({ reports, summaryOnly = false }:
         <div className="profitability-panel-heading">
           <div><h3 id="monthly-profit-trend-title">Monthly profit · last 12 months</h3><p>Branch monthly profit over time</p></div>
         </div>
-        {trendValues.length > 0 ? <div className="monthly-profit-chart-wrap">
-          <svg className="monthly-profit-chart" viewBox="0 0 780 260" role="img" aria-label="Bar graph of monthly profit for the last 12 months">
+        {trendValues.length > 0 ? <div className="monthly-trend-data has-values-table">
+          <div className="monthly-profit-chart-wrap"><svg className="monthly-profit-chart" viewBox="0 0 780 260" role="img" aria-label="Bar graph of monthly profit for the last 12 months">
             {[0, 1, 2, 3, 4].map((step) => {
               const y = 20 + step * 47.5;
               const value = trendMax - step * trendRange / 4;
@@ -293,7 +293,8 @@ export default function ProfitabilityAnalytics({ reports, summaryOnly = false }:
             </g>)}
             <text x="400" y="258" textAnchor="middle" className="monthly-profit-axis-title">Month</text>
             <text transform="translate(12 125) rotate(-90)" textAnchor="middle" className="monthly-profit-axis-title">Monthly profit (LKR)</text>
-          </svg>
+          </svg></div>
+          <div className="monthly-trend-table-wrap"><table className="monthly-trend-table"><thead><tr><th scope="col">Month</th><th scope="col">Value</th></tr></thead><tbody>{monthlyTrend.filter((item) => item.profit !== null).map((item) => <tr key={item.month}><td>{item.month.replace('\n', ' ')}</td><td>{money.format(item.profit!)}</td></tr>)}</tbody></table></div>
         </div> : <p className="profit-chart-empty">Monthly profit data is unavailable for this branch.</p>}
       </section>}
 

@@ -26,12 +26,15 @@ function LoanTrendChart({ title, unit, values }: { title: string; unit: 'LKR' | 
   const formatTick = (value: number) => unit === '%' ? `${percentage.format(value)}%` : `LKR ${number.format(value)}`;
   return <article className="loan-trend-card">
     <h3>{title}</h3>
+    <div className="loan-trend-data">
     <div className="loan-trend-scroll">
       <svg className="loan-trend-chart" viewBox={`0 0 ${width} ${height}`} role="img" aria-label={`${title} over the last ${values.length} months`}>
         {ticks.map((tick) => <g key={tick}><line x1={left} x2={width - right} y1={y(tick)} y2={y(tick)} className="loan-trend-grid"/><text x={left - 8} y={y(tick) + 4} textAnchor="end" className="loan-trend-tick">{formatTick(tick)}</text></g>)}
         {plottedValues.map(({ month, value }, index) => <rect key={`${month}-${index}`} x={x(index) - 14} y={Math.min(y(value), y(0))} width="28" height={Math.max(Math.abs(y(value) - y(0)), 1)} className="loan-trend-bar"><title>{`${month}: ${formatTick(value)}`}</title></rect>)}
         {plottedValues.map(({ month }, index) => <text key={month} x={x(index)} y={height - 12} textAnchor="middle" className="loan-trend-month">{month}</text>)}
       </svg>
+    </div>
+    <div className="monthly-trend-table-wrap"><table className="monthly-trend-table"><thead><tr><th scope="col">Month</th><th scope="col">Value</th></tr></thead><tbody>{values.filter((item): item is { month: string; value: number } => item.value !== null).map(({ month, value }) => <tr key={month}><td>{month}</td><td>{formatTick(value)}</td></tr>)}</tbody></table></div>
     </div>
     {!data.length && <p className="loan-trend-empty">No monthly values are available for this period.</p>}
     <p className="visually-hidden">Monthly values: {values.map(({ month, value }) => `${month}: ${value === null ? 'not reported' : formatTick(value)}`).join('; ')}</p>

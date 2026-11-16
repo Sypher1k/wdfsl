@@ -129,7 +129,16 @@
 .loan-trend-card{min-width:0;padding:22px;background:#fff;border:1px solid var(--line)}
 .loan-trend-card h3{margin:0 0 12px;color:var(--forest);font-size:16px}
 .loan-trend-scroll{width:100%;overflow-x:auto}
-.loan-trend-chart{display:block;width:50%;min-width:280px;height:auto;overflow:visible}
+.loan-trend-data,.monthly-trend-data.has-values-table{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(240px,.9fr);align-items:start;gap:18px}
+.loan-trend-chart{display:block;width:100%;min-width:280px;height:auto;overflow:visible}
+.monthly-trend-data .monthly-profit-chart-wrap{min-width:0}
+.monthly-trend-data .monthly-profit-chart{width:100%;min-width:0}
+.monthly-trend-table-wrap{max-height:270px;overflow:auto;border:1px solid var(--line);background:#fff}
+.monthly-trend-table{width:100%;border-collapse:collapse;font-size:11px}
+.monthly-trend-table th,.monthly-trend-table td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+.monthly-trend-table th{position:sticky;top:0;background:var(--cream);color:var(--forest);font-size:10px;text-transform:uppercase;letter-spacing:.08em}
+.monthly-trend-table td:last-child{text-align:right;font-variant-numeric:tabular-nums}
+.monthly-trend-table tbody tr:last-child td{border-bottom:0}
 .loan-trend-grid{stroke:var(--line);stroke-width:1}
 .loan-trend-tick,.loan-trend-month{fill:var(--muted);font:10px Manrope,system-ui,sans-serif}
 .loan-trend-line{fill:none;stroke:var(--wine);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
@@ -158,14 +167,14 @@
 .monthly-profit-trend .profitability-panel-heading h3{margin:0;font-size:clamp(22px,3vw,30px)}
 .monthly-profit-trend .profitability-panel-heading p{margin:5px 0 0;font-size:12px;color:var(--muted)}
 .monthly-profit-chart-wrap{width:100%;overflow-x:auto}
-.monthly-profit-chart{display:block;width:50%;min-width:280px;height:auto;overflow:visible}
+.monthly-profit-chart{display:block;width:100%;min-width:420px;height:auto;overflow:visible}
 .monthly-profit-gridline{stroke:var(--line);stroke-width:1}
 .monthly-profit-tick,.monthly-profit-month{fill:var(--muted);font:10px Arial,sans-serif}
 .monthly-profit-line{stroke:var(--forest);stroke-width:3;stroke-linecap:round}
 .monthly-profit-point{fill:var(--wine);stroke:var(--paper);stroke-width:2}
 .monthly-profit-bar{fill:var(--forest)}
 .monthly-profit-axis-title{fill:var(--ink);font:700 10px Arial,sans-serif}
-@media(max-width:650px){.profitability{margin-top:75px;padding-top:55px}.profitability-heading,.profitability-panel-heading{align-items:flex-start;flex-direction:column}.profitability-heading>p{max-width:none}.profitability-summary{grid-template-columns:1fr;gap:8px}.profitability-card{min-height:105px;padding:20px 22px}.profitability-panel-heading h3{font-size:30px}.profit-chart-columns,.profitability-table-columns{grid-template-columns:1fr;gap:20px}.profit-chart-controls{width:100%;flex-wrap:wrap}.profit-month-filter{width:100%;justify-content:space-between}.profit-month-filter select{flex:1}.profit-chart-row{grid-template-columns:minmax(88px,115px) minmax(70px,1fr) minmax(72px,90px);gap:9px}.profit-chart-name,.profit-chart-value{font-size:10px}.profit-branch-filter,.profit-table-filter{width:100%}.profit-table-filters{width:100%;align-items:stretch;flex-direction:column}.profit-table-filter select{width:100%}.profit-search{width:100%;align-items:flex-start;flex-direction:column;gap:7px}.profit-search input{width:100%}}
+@media(max-width:650px){.profitability{margin-top:75px;padding-top:55px}.profitability-heading,.profitability-panel-heading{align-items:flex-start;flex-direction:column}.profitability-heading>p{max-width:none}.profitability-summary{grid-template-columns:1fr;gap:8px}.profitability-card{min-height:105px;padding:20px 22px}.profitability-panel-heading h3{font-size:30px}.profit-chart-columns,.profitability-table-columns{grid-template-columns:1fr;gap:20px}.profit-chart-controls{width:100%;flex-wrap:wrap}.profit-month-filter{width:100%;justify-content:space-between}.profit-month-filter select{flex:1}.profit-chart-row{grid-template-columns:minmax(88px,115px) minmax(70px,1fr) minmax(72px,90px);gap:9px}.profit-chart-name,.profit-chart-value{font-size:10px}.profit-branch-filter,.profit-table-filter{width:100%}.profit-table-filters{width:100%;align-items:stretch;flex-direction:column}.profit-table-filter select{width:100%}.profit-search{width:100%;align-items:flex-start;flex-direction:column;gap:7px}.profit-search input{width:100%}.loan-trend-data,.monthly-trend-data.has-values-table{grid-template-columns:1fr}.loan-trend-chart{min-width:520px}.monthly-trend-data .monthly-profit-chart{min-width:520px}}
 @media(max-width:900px){.loans-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:900px){.membership-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:650px){.loans-analytics{margin-top:75px;padding-top:55px}.loans-heading,.savings-heading,.membership-heading{align-items:flex-start;flex-direction:column}.loan-filters{width:100%;display:grid;grid-template-columns:1fr}.membership-filters{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.loans-heading .profit-month-filter,.savings-heading .profit-month-filter,.membership-heading .profit-month-filter,.loan-branch-filter{width:100%;justify-content:space-between}.membership-heading .profit-month-filter,.membership-heading .loan-branch-filter{min-width:0}.membership-heading .profit-month-filter{align-items:stretch;flex-direction:column;gap:7px}.membership-heading .profit-month-filter select{min-width:0;padding-right:8px}.profit-month-filter select,.loan-branch-trigger{width:100%}.loan-metric{min-height:125px;padding:18px}.loan-metric strong{font-size:24px}.savings-analytics,.membership-analytics{margin-top:75px;padding-top:55px}.savings-metrics{grid-template-columns:1fr}.savings-metric{min-height:125px;padding:20px}.savings-metric strong{font-size:32px}.membership-metrics{grid-template-columns:1fr 1fr}.membership-metric{min-height:112px;padding:16px}.membership-metric strong{font-size:25px}}

@@ -5,7 +5,7 @@ import type { MonthlyReport } from './ProfitabilityAnalytics';
 
 const number = new Intl.NumberFormat('en-LK', { maximumFractionDigits: 0 });
 
-function SavingsTrend({ values }: { values: { month: string; value: number | null }[] }) {
+function SavingsTrend({ values, showTable }: { values: { month: string; value: number | null }[]; showTable: boolean }) {
   const width = 780;
   const height = 260;
   const left = 92;
@@ -24,12 +24,12 @@ function SavingsTrend({ values }: { values: { month: string; value: number | nul
   const ticks = [0, 1, 2, 3, 4].map((step) => max - step * range / 4);
   return <section className="monthly-profit-trend savings-trend" aria-labelledby="savings-trend-title">
     <div className="profitability-panel-heading"><div><h3 id="savings-trend-title">Monthly savings · last 12 months</h3><p>Total savings amount over time</p></div></div>
-    {available.length ? <div className="monthly-profit-chart-wrap"><svg className="monthly-profit-chart" viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Bar graph of savings amount by month for the last 12 months">
+    {available.length ? <div className={`monthly-trend-data ${showTable ? 'has-values-table' : ''}`}><div className="monthly-profit-chart-wrap"><svg className="monthly-profit-chart" viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Bar graph of savings amount by month for the last 12 months">
       {ticks.map((tick, step) => { const tickY = top + step * chartHeight / 4; return <g key={step}><line x1={left} x2={width - right} y1={tickY} y2={tickY} className="monthly-profit-gridline"/><text x={left - 8} y={tickY + 4} textAnchor="end" className="monthly-profit-tick">{format(tick)}</text></g>; })}
       {plottedValues.map(({ month, value }, index) => <g key={`${month}-${index}`}><rect x={x(index) - 14} y={y(value)} width="28" height={Math.max(chartHeight - (y(value) - top), 1)} className="monthly-profit-bar"><title>{`${month}: ${format(value)}`}</title></rect><text x={x(index)} y={height - 28} textAnchor="middle" className="monthly-profit-month">{month}</text></g>)}
       <text x={width / 2} y={height - 3} textAnchor="middle" className="monthly-profit-axis-title">Month</text>
       <text transform={`translate(18 ${height / 2}) rotate(-90)`} textAnchor="middle" className="monthly-profit-axis-title">Savings amount</text>
-    </svg></div> : <p className="profit-chart-empty">Monthly savings data is unavailable for this period.</p>}
+    </svg></div>{showTable && <div className="monthly-trend-table-wrap"><table className="monthly-trend-table"><thead><tr><th scope="col">Month</th><th scope="col">Value</th></tr></thead><tbody>{values.filter((item): item is { month: string; value: number } => item.value !== null).map(({ month, value }) => <tr key={month}><td>{month}</td><td>{format(value)}</td></tr>)}</tbody></table></div>}</div> : <p className="profit-chart-empty">Monthly savings data is unavailable for this period.</p>}
   </section>;
 }
 
@@ -113,7 +113,7 @@ export default function SavingsAnalytics({ reports, branchName }: { reports: Mon
         <article className="savings-metric"><span>Total Savings Amount</span><strong>{metrics.totalSavingsAmount === null ? 'Data unavailable' : number.format(metrics.totalSavingsAmount)}</strong></article>
         <article className="savings-metric"><span>Savings Members</span><strong>{metrics.savingsMembers === null ? 'Data unavailable' : number.format(metrics.savingsMembers)}</strong></article>
       </div>
-      <SavingsTrend values={trendValues} />
+      <SavingsTrend values={trendValues} showTable={Boolean(branchName)} />
       <p className="savings-source">Source: {report.sourceFile}. All-branch totals sum reported branch values; blank and dash entries are excluded rather than treated as zero. Currency is not specified in the source.</p>
     </section>
   );

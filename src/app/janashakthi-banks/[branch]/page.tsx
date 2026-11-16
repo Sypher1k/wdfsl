@@ -51,6 +51,10 @@ export default async function BankBranchPage({ params }: { params: Promise<{ bra
         <iframe title={`Map to ${branchName} branch`} src={`https://maps.google.com/maps?q=${encodeURIComponent(`${branchName}, Sri Lanka`)}&output=embed`} loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
       </div>
     </section>
+    <ProfitabilityAnalytics reports={reports} summaryOnly />
+    <LoansAnalytics reports={reports} branchName={branchName} />
+    <SavingsAnalytics reports={reports} branchName={branchName} />
+    <MonthlyCommunityReports reports={reports} />
     <section className="insurance-ytd" aria-labelledby="insurance-ytd-title">
       <div className="section-label">YEAR TO DATE</div>
       <h2 id="insurance-ytd-title">Insurance Summary</h2>
@@ -69,10 +73,6 @@ export default async function BankBranchPage({ params }: { params: Promise<{ bra
       </> : <p className="insurance-ytd-empty">No year to date insurance data is available for this branch.</p>}
       <p className="insurance-ytd-source">Source: insurance_report_ytd.csv</p>
     </section>
-    <ProfitabilityAnalytics reports={reports} summaryOnly />
-    <LoansAnalytics reports={reports} branchName={branchName} />
-    <SavingsAnalytics reports={reports} branchName={branchName} />
-    <MonthlyCommunityReports reports={reports} />
 
   </PageShell>;
 }
