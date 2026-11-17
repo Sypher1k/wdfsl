@@ -16,6 +16,32 @@ export default function BankPage() {
     branches: report.branches.map((branch) => ({ ...branch, ...regions.get(branch.name) })),
   }));
   return <PageShell label="JANASHAKTHI BANKS" image={{ src: '/images/wdf-img-4.jpeg', alt: 'Women gathered around records at a community banking meeting' }} title={<>Community finance, <em>built from within.</em></>}>
+    <section className="bank-governance">
+      <div className="section-label">01 / GOVERNANCE AND OPERATIONS</div>
+      <div className="bank-governance-intro">
+        <h2>Local responsibility.<br /><em>Shared purpose.</em></h2>
+        <p>The Women’s Development Federation delegates operational authority and responsibility to Janashakthi Bank Societies so its vision, mission and activities can be carried out locally. The societies put WDF’s objectives into practice by empowering families.</p>
+      </div>
+      <div className="bank-meeting-grid">
+        <article><span>01</span><b>Board of Management</b><small>Meets every two weeks</small></article>
+        <article><span>02</span><b>Monday meetings</b><small>Weekly staff planning and review</small></article>
+        <article><span>03</span><b>Fortnightly meetings</b><small>Regular operational review</small></article>
+        <article><span>04</span><b>Women’s Society meetings</b><small>Member and society coordination</small></article>
+        <article><span>05</span><b>Zonal and family meetings</b><small>Regional and household connection</small></article>
+      </div>
+      <div className="bank-governance-detail">
+        <article>
+          <span>BOARD OF MANAGEMENT</span>
+          <p>The Board includes honorary women’s-society chairpersons, bank-society staff and supervisory officers, including the Zonal Audit Secretary and Zonal Coordinator.</p>
+          <ul><li>Approve customer enrolment, payments supported by the relevant management papers, and loans.</li><li>Present and review the society’s financial position.</li><li>Supervise staff performance and consider legal action on overdue loans.</li><li>Maintain PAR at 0%, as stated in the source translation.</li></ul>
+        </article>
+        <article>
+          <span>MONDAY STAFF MEETINGS</span>
+          <p>All bank-society staff attend with the Zonal Audit Secretary and Zonal Coordinator.</p>
+          <ul><li>Set work targets for the coming week.</li><li>Review progress from the previous week.</li><li>Guide actions that support the society’s profitability.</li></ul>
+        </article>
+      </div>
+    </section>
     <div className="content-grid">
       <div><h3>Purpose</h3><p>The Bank Society objectives include increasing family savings, providing loans for income generation, emergencies and housing, introducing social-security mechanisms, mobilizing members for social participation and bringing women together within a strong economic organization.</p></div>
       <div><h3>Membership</h3><p>The supplied Bank Development document describes group-based membership, a minimum LKR 500 share and loan eligibility after one month of membership, subject to the stated conditions.</p></div>
