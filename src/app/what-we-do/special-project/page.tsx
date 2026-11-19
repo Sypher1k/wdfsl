@@ -5,42 +5,52 @@ import Arrow from '@/components/Arrow';
 
 export const metadata: Metadata = {
   title: 'Special Project',
-  description: 'WDF community programmes for young people, children, older people, families and women.',
+  description: 'WDF programmes for young people, children, older people, families and women across its communities.',
 };
 
 const youthActivities = [
-  'Counselling and leadership development',
-  'Health, internet-use and drug-prevention awareness',
-  'Savings, Deavi loans and support to start businesses',
-  'Links to vocational training and opportunities with WDF',
+  'Psychological counselling',
+  'Leadership training',
+  'Youth health awareness',
+  'Responsible internet-use awareness',
+  'Drug-prevention programmes',
 ];
 
 const childrenActivities = [
-  'Savings and children’s society activities',
-  'Public-speaking, art and quiz competitions',
-  'Drug-prevention activities and special-day events',
-  'Educational trips, excursions and bank-society libraries',
+  'Encouraging regular savings and running children’s societies',
+  'Speech competitions, drawing competitions and quizzes',
+  'Drug-prevention and awareness programmes',
+  'Special events and celebrations with society members',
+  'Educational trips for recreation and learning outside the classroom',
+  'Libraries at every Janashakthi Bank Society to support reading habits and skills',
 ];
 
-const gardenActivities = ['Composting', 'Vegetables and leafy greens', 'Fruit', 'Cow’s milk'];
+const gardenActivities = [
+  'Compost pits for organic fertilizer',
+  'Vegetables',
+  'Fruit',
+  'Fresh milk',
+  'Leafy vegetables and greens',
+];
 
 const enterpriseActivities = [
   'Mushroom cultivation',
-  'Traditional sweets and confectionery',
-  'Poultry farming and handicrafts',
+  'Traditional sweets and confectionery making',
+  'Poultry farming',
+  'Handicraft production',
   'Pepper, gotukola, betel, passion fruit, butterfly pea and aloe vera cultivation',
 ];
 
 const drugPreventionResults = [
-  ['907', 'families surveyed on income and expenditure'],
-  ['735', 'families shown ways to save'],
-  ['674', 'families encouraged to begin saving'],
-  ['490', 'shops reached with awareness'],
-  ['290', 'shops stopped selling cigarettes after awareness work'],
-  ['36', 'media responses or communications about prevention'],
-  ['260', 'people supported to stop or reduce substance use'],
-  ['12', 'schools reached through prevention programmes'],
-  ['37', 'events where organisers took steps not to serve alcohol'],
+  ['907', 'families surveyed about household income and expenditure'],
+  ['735', 'families introduced to savings methods'],
+  ['674', 'families encouraged to start saving'],
+  ['37', 'social and festive events held without alcohol'],
+  ['490', 'shops made aware of smoking and substance use harms'],
+  ['290', 'shops that stopped selling cigarettes after awareness work'],
+  ['36', 'media responses about drug-prevention activities'],
+  ['260', 'people who stopped or reduced cigarette, alcohol or drug use'],
+  ['12', 'schools reached by drug-prevention programmes'],
 ];
 
 export default function SpecialProjectPage() {
@@ -56,60 +66,82 @@ export default function SpecialProjectPage() {
           <h2>Responding to needs across <em>every generation.</em></h2>
         </div>
         <div>
-          <p className="large-copy">WDF’s Special Projects Division carries out focused social development work alongside the Federation’s economic programmes.</p>
-          <p>Its work includes youth and children’s societies, support for older people, home gardens, drug prevention, rights awareness, livelihood training, special-day activities and partnerships with non-governmental organisations.</p>
-          <p>The Division also operates Deavi Hela Bojunhala. “Deavi” and “Deavi Hela Bojunhala” are retained as transliterated names in the supplied translation.</p>
+          <p className="large-copy">The Women’s Development Federation focuses on poverty alleviation and women’s empowerment, with social development as another important part of its work.</p>
+          <p>Janashakthi Bank Societies are described as the Federation’s economic arm. The Special Projects Division was established to carry out social development work through specialised community activities.</p>
+          <p>Its work includes youth and children’s societies, senior citizens’ societies, home gardening, drug prevention, women’s and children’s rights, special-day activities, support services, vocational training, NGO partnerships and the Devi Hela Bojunhala traditional food outlet.</p>
         </div>
       </section>
 
-      <section className="special-stats" aria-label="Programme reach reported in the source translation">
-        <div><strong>133</strong><span>Deavi youth societies</span><small>Across 99 Janashakthi Bank Societies</small></div>
-        <div><strong>449</strong><span>Children’s societies</span><small>Established through bank societies</small></div>
-        <div><strong>572</strong><span>Older people’s societies</span><small>Across the Janashakthi network</small></div>
+      <section className="special-stats" aria-label="Society counts reported in the revised translation">
+        <div><strong>133</strong><span>Devi Societies</span><small>Across 99 Janashakthi Bank Societies</small></div>
+        <div><strong>449</strong><span>Children’s Societies</span><small>Established through Janashakthi Bank Societies</small></div>
+        <div><strong>572</strong><span>Senior Citizens’ Societies</span><small>Across the Janashakthi Bank Societies</small></div>
       </section>
-      <p className="special-source-note">These programme counts are reported in the supplied translation. The document does not date them; confirm current figures with WDF.</p>
+      <p className="special-source-note">These society counts are reported in the revised translation; it does not give a reporting date. Confirm current figures with WDF.</p>
 
       <section className="special-section">
-        <div className="section-label">01 / YOUNG PEOPLE AND CHILDREN</div>
-        <div className="special-heading"><h2>Room to learn, lead <em>and grow.</em></h2><p>Deavi programmes engage young people aged 18–35. Children’s societies bring together children aged 6–16 to develop their abilities, leadership and attitudes, and to help them respond to abuse, exploitation and violence.</p></div>
+        <div className="section-label">01 / DEVI YOUTH AND CHILDREN</div>
+        <div className="special-heading"><h2>Room to learn, lead <em>and grow.</em></h2><p>The Devi Youth Programme engages young women and men aged 18–35. Children’s Societies bring together children aged 6–16 to develop skills, talents, confidence, positive attitudes and leadership.</p></div>
         <div className="special-program-grid">
-          <article><span>DEAVI YOUTH</span><h3>Build confidence and pathways</h3><p>Every other month, Deavi society chairpersons, secretaries and organisers take part in progress reviews. The Division also introduces new programmes and links young people with vocational training.</p><ul>{youthActivities.map((activity) => <li key={activity}>{activity}</li>)}</ul></article>
-          <article><span>CHILDREN’S SOCIETIES</span><h3>Encourage talent and wellbeing</h3><p>The programme recognises children’s talents and encourages positive change. The source also describes a “happiness calendar” approach to help children respond positively when a father’s substance use affects family finances.</p><ul>{childrenActivities.map((activity) => <li key={activity}>{activity}</li>)}</ul></article>
+          <article><span>DEVI YOUTH</span><h3>Build confidence and pathways</h3><p>Progress-review meetings take place every other month with Devi Society Presidents, Secretaries and Organizers. Progress is reviewed, and new activities are introduced and implemented.</p><ul>{youthActivities.map((activity) => <li key={activity}>{activity}</li>)}</ul><p>Members are encouraged to save regularly, start business ventures and access Devi loans. They form small groups and societies, and are guided towards vocational training and opportunities to work alongside WDF.</p></article>
+          <article><span>CHILDREN’S SOCIETIES</span><h3>Encourage talent and wellbeing</h3><p>WDF has established 449 societies through Janashakthi Bank Societies. The programme recognises children’s abilities and supports them to face child abuse, exploitation and violence.</p><ul>{childrenActivities.map((activity) => <li key={activity}>{activity}</li>)}</ul><p>The “Happy Calendar” approach encourages children to respond positively when their fathers’ drug use harms the family’s financial wellbeing, and to motivate their fathers to address drug-related problems.</p></article>
         </div>
       </section>
 
       <section className="special-community-band">
-        <div className="section-label light">02 / CONNECTION AND BELONGING</div>
-        <div className="special-heading"><h2>Recognising older people. <em>Growing at home.</em></h2><p>Older people’s societies offer a way to reach people who may be isolated, strengthen friendship and companionship, and recognise their contributions.</p></div>
+        <div className="section-label light">02 / CONNECTION AND HOUSEHOLD FOOD</div>
+        <div className="special-heading"><h2>Recognising older people. <em>Growing at home.</em></h2><p>Special Projects works to reduce social isolation among older people and provide ways for them to connect with others and take part in community activities.</p></div>
         <div className="special-community-grid">
-          <article><span>OLDER PEOPLE</span><h3>Strengthen social connection</h3><p>The translation reports 572 societies for older people across the Janashakthi Bank Society network.</p></article>
-          <article><span>HOME GARDENS</span><h3>Support household food</h3><p>Families receive guidance to organise gardens that can supply a range of food for their own use.</p><div className="special-tags">{gardenActivities.map((activity) => <b key={activity}>{activity}</b>)}</div></article>
+          <article><span>SENIOR CITIZENS’ SOCIETIES</span><h3>Strengthen social connection</h3><p>The revised translation reports 572 societies across the Janashakthi Bank Societies. Their work supports friendship and social connection, and recognises older people’s contributions and experience.</p></article>
+          <article><span>SUSTAINABLE HOME GARDENS</span><h3>Support household food</h3><p>Households receive guidance on developing gardens that produce a variety of food for their own consumption. Families are encouraged to use their gardens to support household food needs.</p><div className="special-tags">{gardenActivities.map((activity) => <b key={activity}>{activity}</b>)}</div></article>
         </div>
       </section>
 
       <section className="special-section special-drugs">
-        <div className="section-label">03 / “SAY NO TO DRUGS”</div>
-        <div className="special-heading"><h2>Prevention through <em>community action.</em></h2><p>Social mobilisation managers in Janashakthi Bank Societies are trained as drug-prevention trainers, then raise awareness in their villages. The source reports the following programme results:</p></div>
+        <div className="section-label">03 / WOMEN AGAINST DRUGS</div>
+        <div className="special-heading"><h2>Prevention through <em>community action.</em></h2><p>The overview calls this the “Women Against Drugs” programme; a later heading in the translation calls it “Say No to Drugs.” Community mobilization officers attached to Janashakthi Bank Societies are trained as drug-prevention trainers, then lead village awareness programmes.</p></div>
         <div className="special-results-grid">{drugPreventionResults.map(([count, label]) => <div key={label}><strong>{count}</strong><span>{label}</span></div>)}</div>
-        <p className="special-source-note">These are figures reported in the supplied translation; no reporting period is provided. The source also states that non-communicable diseases account for 83% of community deaths and that smoking causes approximately 50–55 deaths per day, or around 20,000 per year. Those public-health claims are reproduced from the source and have not been independently verified.</p>
+        <p className="special-source-note">The revised translation states that non-communicable diseases account for 83% of community deaths and that smoking causes approximately 50–55 deaths per day, or around 20,000 each year. These figures are attributed to the source and have not been independently verified. Programme results are also source-reported; no reporting period is given.</p>
       </section>
 
       <section className="special-enterprise">
-        <div className="special-enterprise-copy"><div className="section-label light">04 / LIVELIHOODS AND SUPPORT SERVICES</div><h2>Skills connected to <em>opportunity.</em></h2><p>Through women’s societies, WDF offers training and advice to women who are not currently in business, helping them explore small enterprises they can start from home.</p></div>
+        <div className="special-enterprise-copy"><div className="section-label light">04 / SUPPORT SERVICES AND LIVELIHOODS</div><h2>Skills connected to <em>opportunity.</em></h2><p>Through community mobilization and Women’s Societies, WDF trains and advises women who are not currently engaged in income-generating activities, helping them start small businesses from home. Advisory and counselling programmes also support women in this work.</p></div>
         <div className="special-enterprise-list">{enterpriseActivities.map((activity, i) => <div key={activity}><span>0{i + 1}</span><b>{activity}</b></div>)}</div>
       </section>
 
-      <section className="special-section special-partnerships">
-        <div className="section-label">05 / RIGHTS AND PARTNERSHIPS</div>
-        <div className="special-heading"><h2>Women’s voices in <em>public life.</em></h2><p>The Division takes action on women’s and children’s rights, marks special days and connects communities with support services.</p></div>
-        <div className="special-partnership-grid">
-          <article><span>WOMEN’S VOICE AND LEADERSHIP SRI LANKA (NEW FACE)</span><h3>Leadership grounded in collective organising</h3><p>Supported by The Asia Foundation, the project trains ten trainers. Its work includes raising awareness of women’s rights, strengthening women’s leadership through community-based organising and feminist principles, and addressing technology-facilitated violence.</p></article>
-          <article><span>WOMEN AND MEDIA COLLECTIVE</span><h3>Recognise unpaid care work</h3><p>WDF has partnered with WMC Women and Media Collective on awareness and lecture programmes to build understanding of unpaid care work.</p></article>
-        </div>
-        <div className="special-days"><b>Community activities also mark</b><span>International Women’s Day</span><span>Sinhala and Tamil New Year</span><span>Religious festivals</span><span>Drug-prevention awareness days</span><span>Tobacco-prevention day</span></div>
+      <section className="special-section special-vocational">
+        <div className="section-label">05 / VOCATIONAL TRAINING FOR YOUNG PEOPLE</div>
+        <div className="special-heading"><h2>Practical skills for <em>future choices.</em></h2><p>Through Devi Youth Societies, WDF guides young women and men towards suitable vocational training to develop practical skills, knowledge and abilities.</p></div>
+        <div className="special-vocational-panel"><p>Training can help young people build work-related skills and explore employment or self-employment opportunities. The Federation connects vocational training with savings, entrepreneurship and other youth-development activities to support economic independence and participation in community development.</p><p>WDF also describes opportunities for young people to engage with and work alongside the Federation.</p></div>
       </section>
 
-      <section className="special-contact"><div><div className="section-label light">CONNECTED COMMUNITY WORK</div><h2>Explore WDF’s wider <em>development programmes.</em></h2><p>Learn about the community groups and services that connect with this work.</p></div><div><Link className="text-link" href="/what-we-do/social-mobilisation">Social Mobilisation <Arrow /></Link><Link className="text-link" href="/janashakthi-banks">Janashakthi Banks <Arrow /></Link></div></section>
+      <section className="special-section special-rights">
+        <div className="section-label">06 / WOMEN’S AND CHILDREN’S RIGHTS</div>
+        <div className="special-heading"><h2>Know rights. Build voice. <em>Strengthen protection.</em></h2><p>WDF conducts community awareness programmes to educate women and families about women’s and children’s rights.</p></div>
+        <div className="special-rights-grid"><article><span>UNDERSTANDING AND CONFIDENCE</span><p>Social development initiatives encourage women to understand their rights, build confidence and strengthen leadership skills.</p></article><article><span>SAFETY AND PARTICIPATION</span><p>WDF raises awareness about gender-based violence, including technology-facilitated violence, promotes the protection of women and children, and encourages women’s active participation in community activities.</p></article></div>
+      </section>
+
+      <section className="special-section special-partnerships">
+        <div className="section-label">07 / NGO PARTNERSHIPS AND UNPAID CARE</div>
+        <div className="special-heading"><h2>Collective action with <em>partners.</em></h2><p>The Division implements projects with local and international non-governmental organisations.</p></div>
+        <div className="special-partnership-grid">
+          <article><span>WOMEN’S VOICE AND LEADERSHIP SRI LANKA (NEW APPROACH)</span><h3>Leadership grounded in collective organising</h3><p>Supported by The Asia Foundation, this project trains ten trainers to improve awareness of women’s rights and reach communities; strengthen women’s leadership through community-based women’s collective organising, feminist principles and values-based approaches; and raise awareness of technology-facilitated gender-based violence (TFGBV).</p></article>
+          <article><span>WOMEN AND MEDIA COLLECTIVE (WMC)</span><h3>Recognise unpaid care work</h3><p>In collaboration with WMC, WDF conducts awareness sessions and educational programmes to promote recognition of unpaid care work.</p></article>
+        </div>
+      </section>
+
+      <section className="special-section special-days">
+        <div className="section-label">08 / SPECIAL DAYS AND EVENTS</div>
+        <div className="special-heading"><h2>Marking days that <em>bring people together.</em></h2><p>Activities and celebrations are organised at Janashakthi Bank Society level throughout the year.</p></div>
+        <div className="special-day-grid"><span>International Women’s Day</span><span>Sinhala and Tamil New Year celebrations</span><span>Religious festivals and celebrations</span><span>International Day Against Drug Abuse</span><span>World No Tobacco Day</span></div>
+      </section>
+
+      <section className="special-food">
+        <div className="special-food-copy"><div className="section-label light">09 / DEVI HELA BOJUNHALA</div><h2>Traditional food. <em>Local opportunity.</em></h2><p>WDF manages and operates the Devi Hela Bojunhala to promote traditional Sri Lankan food and support local food production.</p></div>
+        <div className="special-food-detail"><p>The initiative encourages traditional cooking practices and locally grown food while creating income-generating opportunities. It supports women’s participation in food preparation, small-scale food production and entrepreneurship.</p></div>
+      </section>
+
+      <section className="special-contact"><div><div className="section-label light">CONNECTED COMMUNITY WORK</div><h2>Explore WDF’s wider <em>development programmes.</em></h2><p>Learn about community groups and services connected with Special Projects.</p></div><div><Link className="text-link" href="/what-we-do/social-mobilisation">Social Mobilisation <Arrow /></Link><Link className="text-link" href="/janashakthi-banks">Janashakthi Banks <Arrow /></Link></div></section>
     </PageShell>
   );
 }
